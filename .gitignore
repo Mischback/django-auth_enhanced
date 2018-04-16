@@ -1,0 +1,24 @@
+# do NOT track editor's settings
+.vscode/
+
+# do NOT track Python compilation files
+*.py[cod]
+__python__/*
+
+# do NOT track tox's testing folder
+.tox
+
+# do NOT track the test database
+test.sqlite
+
+# do NOT track coverage files/folders
+.coverage
+.coverage.*
+htmlcov/
+
+# do NOT track Sphinx build directory
+docs/build/
+
+# do NOT track compiled language files
+*.mo
+*.pot
