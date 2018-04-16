@@ -16,6 +16,7 @@ clean:
 	find . -iname "__pycache__" -delete
 	find . -iname ".coverage.*" -delete
 	rm -rf htmlcov
+	rm -rf docs/build/
 
 # runs the tests and measures code coverage
 coverage: clean test
