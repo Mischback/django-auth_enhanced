@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.staticfiles',   # introduced to make the admin usable inside tox
+    'auth_enhanced.apps.AuthEnhancedConfig'
 ]
 
 MIDDLEWARE = [
