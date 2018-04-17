@@ -20,5 +20,5 @@ app_name = 'auth_enhanced'
 # define the urls to match
 urlpatterns = [
     # TODO: 'url' got replaced by 'path' in Django 2.0
-    url(r'^login/$', LoginView.as_view(template_name='auth_enhanced/login.html')),
+    url(r'^login/$', LoginView.as_view(template_name='auth_enhanced/login.html'), name='login'),
 ]
