@@ -5,6 +5,18 @@
 <div class="element">
   <form method="post" action="{% url 'auth_enhanced:login' %}">
     <h1 class="atom align-right">Login</h1>
+
+    {% if form.non_field_errors %}
+    <div class="atom error-box">
+        <h2>Error!</h2>
+    {% for error in form.non_field_errors %}
+    <p>
+        {{ error }}
+    </p>
+    {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="atom">
       <span class="input-caption">Username</span>
       <input id="id_username" name="username" placeholder="put your username here" required maxlength="254" autofocus type="text" class="form-atom">
