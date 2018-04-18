@@ -7,13 +7,13 @@
     <h1 class="atom align-right">Login</h1>
 
     {% if form.non_field_errors %}
-    <div class="atom error-box">
+    <div class="atom box error-box">
         <h2>Error!</h2>
-    {% for error in form.non_field_errors %}
-    <p>
-        {{ error }}
-    </p>
-    {% endfor %}
+      {% for error in form.non_field_errors %}
+        <p>
+          {{ error }}
+        </p>
+      {% endfor %}
     </div>
     {% endif %}
 
