@@ -47,6 +47,15 @@ isort-full:
 test:
 	tox -e test
 
+# runs only tags with a specific tag
+test_tag ?= current
+test-tag:
+	tox -e test -- -t $(test_tag)
+
+# runs the tests with timing information
+test-time:
+	tox -e test -- --time
+
 ##### wrapper for django-admin commands #####
 
 # creates a superuser
