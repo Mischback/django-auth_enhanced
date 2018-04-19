@@ -2,8 +2,8 @@
 """Contains base classes for test cases"""
 
 # Django imports
-from django.urls import resolve
 from django.test import TestCase
+from django.urls import resolve
 
 
 class AuthEnhancedTestCase(TestCase):
@@ -18,11 +18,8 @@ class AEUrlTestCase(AuthEnhancedTestCase):
         """Raised if one of the assert()-methods is called without correct parameters."""
         pass
 
-    def assertFuncName(self, func_name, resolver_match=None, url=None):
-        """Asserts the view function to be used to serve the URL.
-
-        Even if the parameter is called 'func_name', for CBVs the name of the
-        class must be passed."""
+    def assertCBVName(self, cbv_name, module='auth_enhanced.views', resolver_match=None, url=None):
+        """Asserts the view function to be used to serve the URL."""
 
         # either a ResolverMatch object or an URL-string must be given
         if not resolver_match and not url:
@@ -32,4 +29,8 @@ class AEUrlTestCase(AuthEnhancedTestCase):
         if not resolver_match:
             resolver_match = resolve(url)
 
-        self.assertEqual(resolver_match.func.__name__, func_name)
+        # test the name of the CBV (class name)
+        self.assertEqual(resolver_match.func.__name__, cbv_name)
+
+        # test the name of the containing module
+        self.assertEqual(resolver_match.func.__module__, module)

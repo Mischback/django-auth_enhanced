@@ -12,6 +12,7 @@ from django.urls import reverse
 from .utils.testcases import AEUrlTestCase
 
 
+@tag('urls')
 class UrlTests(AEUrlTestCase):
     """Tests targeting the app's URL configuration"""
 
@@ -22,4 +23,13 @@ class UrlTests(AEUrlTestCase):
         url = reverse('auth_enhanced:login')
         self.assertEqual(url, '/login/')
 
-        self.assertFuncName('LoginView', url=url)
+        self.assertCBVName('LoginView', module='django.contrib.auth.views', url=url)
+
+    def test_logout_url(self):
+        """Can the URL be retrieved by its name and is the right function used?"""
+
+        # get the URL by its name
+        url = reverse('auth_enhanced:logout')
+        self.assertEqual(url, '/logout/')
+
+        self.assertCBVName('LogoutView', module='django.contrib.auth.views', url=url)
