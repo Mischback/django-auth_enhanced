@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""django-auth_enhanced: App specific test-runner
+"""Includes an app-specific test runner.
 
 This test runner heavily relies on Django's DiscoverRunner. In fact, it is very
 close to Django's own test runner.
@@ -8,7 +8,15 @@ close to Django's own test runner.
 It accepts less options and looks for the tests to be run in the current
 directory instead of app's test-directories.
 
-It can't be run on certain modules only (obviously), but on given tags."""
+    - available command line options:
+        * --disable-optimisation    disables all test-specific optimisations
+        * --enable-migrations       enables migrations during testing
+        * --settings                specify a settings-module for the test run
+        * --tag, -t                 specify one (or multiple) tags to be tested
+        * --time                    enables time measurement during tests
+        * --verbosity, -v           verbosity level (0, 1, 2, 3)
+
+It can't be run on certain modules only, but on given tags."""
 
 # Python imports
 import argparse

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""django-auth_enhanced: URL configuration
-
-Contains app specific URLS to decouple them from the project's URL config.
+"""Contains app specific URLS to decouple them from the project's URL config.
 
 Include them in the project's 'urls.py', i.e.
     url(r'^auth/', include('auth_enhanced.urls')),

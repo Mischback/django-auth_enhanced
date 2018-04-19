@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""django-auth_enhanced: Development/test settings.
-
-This file contains minimum settings to run the development inside of
+"""Contains minimum settings to run the development inside of
 tox-environments and run the tests.
 
 Please note, that some settings are explicitly set by the testrunner (see

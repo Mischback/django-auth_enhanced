@@ -12,7 +12,11 @@ class AuthEnhancedTestCase(TestCase):
 
 
 class AEUrlTestCase(AuthEnhancedTestCase):
-    """Test cases for URL configuration"""
+    """Test cases for URL configuration
+
+    Provides an additional assert()-method, 'assertCBVName' to check, if an url
+    (specified by an url-string or an ResolverMatch-object) is connected with
+    the right CBV."""
 
     class InvalidParameterException(Exception):
         """Raised if one of the assert()-methods is called without correct parameters."""

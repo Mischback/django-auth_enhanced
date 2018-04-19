@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-"""These tests target the URL configuration."""
+"""Includes tests targeting the app-specific URLs.
+
+    - target file: auth_enhanced/urls.py
+    - included tags: 'urls'
+
+Please note, that these are very basic tests, that basically check the correct
+resolution of named URLs to the correct view function / CBV."""
 
 # Python imports
 from unittest import skip  # noqa
