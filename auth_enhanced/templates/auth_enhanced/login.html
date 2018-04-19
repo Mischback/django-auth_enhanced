@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+{% block 'content' %}
+
+<div class="element">
+  <form method="post" action="{% url 'auth_enhanced:login' %}">
+    <h1 class="atom align-right">Login</h1>
+
+    {% if form.non_field_errors %}
+    <div class="atom box error-box">
+        <h2>Error!</h2>
+      {% for error in form.non_field_errors %}
+        <p>
+          {{ error }}
+        </p>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="atom">
+      <span class="input-caption">Username</span>
+      <input id="id_username" name="username" placeholder="put your username here" required maxlength="254" autofocus type="text" class="form-atom">
+    </div>
+
+    <div class="atom">
+      <span class="input-caption">Password</span>
+      <input id="id_password" name="password" placeholder="put your password here" required type="password" class="form-atom">
+    </div>
+
+    <div class="atom">
+      <button type="submit" class="form-atom">Login</button>
+    </div>
+
+    <div class="atom align-right">
+      <a href="#">forgot your password?</a> | <a href="#">Registration</a>
+    </div>
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+  </form>
+</div>
+
+{% endblock %}

@@ -21,7 +21,7 @@ from django.conf import settings
 from django.test.utils import get_runner
 
 
-def setup(enable_migrations, verbosity):
+def setup(disable_optimisation, enable_migrations, enable_timing, verbosity):
     """Prepares the test environment.
 
     Basically, this function is used to inject test-specific settings. It should
@@ -41,29 +41,55 @@ def setup(enable_migrations, verbosity):
             # return 'thesearenotthemigrationsyouarelookingfor'
             return None
 
-    # don't test with debugging enabled
-    settings.DEBUG = False
-    settings.ALLOWED_HOSTS = []
+    if not disable_optimisation:
+        # don't test with debugging enabled
+        settings.DEBUG = False
+        settings.ALLOWED_HOSTS = []
 
-    # disable migrations during tests
-    if not enable_migrations:
-        # see https://simpleisbetterthancomplex.com/tips/2016/08/19/django-tip-12-disabling-migrations-to-speed-up-unit-tests.html  # noqa
-        settings.MIGRATION_MODULES = DisableMigrations()
-        if verbosity >= 2:
-            print('Testing without applied migrations.')
+        # only use one password hasher (and the fastest one)
+        settings.PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher',]
+
+        # turn off logging
+        import logging
+        logging.disable(logging.CRITICAL)
+
+        # disable migrations during tests
+        if not enable_migrations:
+            # see https://simpleisbetterthancomplex.com/tips/2016/08/19/django-tip-12-disabling-migrations-to-speed-up-unit-tests.html  # noqa
+            settings.MIGRATION_MODULES = DisableMigrations()
+            if verbosity >= 2:
+                print('Testing without applied migrations.')
+        else:
+            if verbosity >= 2:
+                print('Testing with applied migrations.')
     else:
         if verbosity >= 2:
-            print('Testing with applied migrations.')
+            print('Testing without any test-specific optimisations.')
+
+    if enable_timing:
+        from django import test
+        import time
+
+        def setUp(self):
+            self.start_time = time.time()
+
+        def tearDown(self):
+            total = time.time() - self.start_time
+            if total > 0.5:
+                print("\n\t\033[91m{:.3f}s\t{}\033[0m".format(total, self._testMethodName))
+
+        test.TestCase.setUp = setUp
+        test.TestCase.tearDown = tearDown
 
     # actually build the Django configuration
     django.setup()
 
 
-def app_tests(enable_migrations, tags, verbosity):
+def app_tests(disable_optimisation, enable_migrations, enable_timing, tags, verbosity):
     """Gets the TestRunner and runs the tests"""
 
     # prepare the actual test environment
-    setup(enable_migrations, verbosity)
+    setup(disable_optimisation, enable_migrations, enable_timing, verbosity)
 
     # reuse Django's DiscoverRunner
     if not hasattr(settings, 'TEST_RUNNER'):
@@ -84,6 +110,10 @@ if __name__ == '__main__':
     # set up the argument parser
     parser = argparse.ArgumentParser(description='Run the django-auth_enhanced test suite')
     parser.add_argument(
+        '--disable-optimisation', action='store_true', dest='disable_optimisation',
+        help="Disables the test specific optimisations."
+    )
+    parser.add_argument(
         '--enable-migrations', action='store_true', dest='enable_migrations',
         help="Enables the usage of migrations during tests."
     )
@@ -95,6 +125,10 @@ if __name__ == '__main__':
     parser.add_argument(
         '-t', '--tag', dest='tags', action='append',
         help="Run only tests with the specified tags. Can be used multiple times."
+    )
+    parser.add_argument(
+        '--time', action='store_true', dest='enable_timing',
+        help="Enables time measurements for all tests."
     )
     parser.add_argument(
         '-v', '--verbosity', default=1, type=int, choices=[0, 1, 2, 3],
@@ -112,7 +146,9 @@ if __name__ == '__main__':
         options.settings = os.environ['DJANGO_SETTINGS_MODULE']
 
     failures = app_tests(
+        options.disable_optimisation,
         options.enable_migrations,
+        options.enable_timing,
         options.tags,
         options.verbosity,
     )
