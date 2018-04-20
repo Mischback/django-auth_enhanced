@@ -40,7 +40,7 @@ DAE_OPERATION_MODE_CHOICES = (
 # FUNCTIONS
 # #############################################################################
 
-def set_app_default_setting(name, default_value):
+def inject_setting(name, default_value):
     """Injects an app-specific setting into Django's settings module.
 
     If the setting is already present in the project's settings module, the set
@@ -50,7 +50,7 @@ def set_app_default_setting(name, default_value):
     or raise an appropriate exception."""
 
     # check, that the name is uppercased
-    if not name.is_upper():
+    if not name.isupper():
         raise ImproperlyConfigured('Only uppercase names are allowed!')
 
     # set the setting, if it is not already present
