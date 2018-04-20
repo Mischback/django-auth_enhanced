@@ -20,7 +20,12 @@ class UserEnhancement(models.Model):
     """This class stores all necessary additional data on Django's User objects.
 
     Please note, that this model is meant to be pluggable by using a reference
-    to 'AUTH_USER_MODEL'."""
+    to 'AUTH_USER_MODEL'.
+
+    TODO: How to ensure, that this is unique? Use ono-to-one instead?
+    TODO: How to automatically create this object during user creation? Rely on
+        signals? Rely on our own form class (child of UserCreationForm)?
+    """
 
     EMAIL_VERIFICATION_COMPLETED = 'EMAIL_VERIFICATION_COMPLETED'
     EMAIL_VERIFICATION_IN_PROGRESS = 'EMAIL_VERIFICATION_IN_PROGRESS'
