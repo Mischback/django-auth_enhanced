@@ -4,6 +4,9 @@
 # Django imports
 from django.apps import AppConfig
 
+# app imports
+from auth_enhanced.settings import set_app_default_settings
+
 
 class AuthEnhancedConfig(AppConfig):
     """App specific configuration class
@@ -18,4 +21,5 @@ class AuthEnhancedConfig(AppConfig):
 
     def ready(self):
         """Executed, when application loading is completed."""
-        pass
+
+        set_app_default_settings()

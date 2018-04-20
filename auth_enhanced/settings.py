@@ -29,11 +29,11 @@ DAE_MODE_EMAIL_ACTIVATION = 'DAE_MODE_EMAIL_ACTIVATION'
 DAE_MODE_MANUAL_ACTIVATION = 'DAE_MODE_MANUAL_ACTIVATION'
 
 # contains the app's operation modes to be used in a model (choices) field
-DAE_OPERATION_MODE_CHOICES = (
-    (DAE_MODE_AUTO_ACTIVATION, _('Automatic activation')),
-    (DAE_MODE_MANUAL_ACTIVATION, _('Manual activation')),
-    (DAE_MODE_EMAIL_ACTIVATION, _('EMail activation')),
-)
+# DAE_OPERATION_MODE_CHOICES = (
+#     (DAE_MODE_AUTO_ACTIVATION, _('Automatic activation')),
+#     (DAE_MODE_MANUAL_ACTIVATION, _('Manual activation')),
+#     (DAE_MODE_EMAIL_ACTIVATION, _('EMail activation')),
+# )
 
 
 # #############################################################################
@@ -58,6 +58,19 @@ def inject_setting(name, default_value):
         setattr(settings, name, default_value)
 
 
-def set_default_settings():
+def set_app_default_settings():
     """Sets all app-specific default settings."""
-    pass
+
+    # ### DAE_OPERATION_MODE
+    # This setting determines the way newly registered are handled.
+    # Possible values:
+    #   DAE_MODE_AUTO_ACTIVATION (default value)
+    #       - newly created accounts will automatically get activated.
+    #   DAE_MODE_EMAIL_ACTIVATION
+    #       - newly created accounts will receive a verification mail. The
+    #           account get activated automatically, when the email address
+    #           is verified
+    #   DAE_MODE_MANUAL_ACTIVATION
+    #       - this mode will *NOT* activate newly registered accounts and
+    #           relies on manual activation by a superuser
+    inject_setting('DAE_OPERATION_MODE', DAE_MODE_AUTO_ACTIVATION)
