@@ -3,7 +3,7 @@
 
 .SILENT:
 .PHONY: benchmark clean coverage doc doc-srv flake8 isort isort-full test \
-		django migrate runserver
+		check createsuperuser django migrate runserver
 
 
 # counts LoCs
@@ -57,6 +57,11 @@ test-time:
 	tox -e test -- --time
 
 ##### wrapper for django-admin commands #####
+
+# runs the check framework
+# django-admin.py check
+check:
+	$(MAKE) django django_cmd="check"
 
 # creates a superuser
 # django-admin.py createsuperuser
