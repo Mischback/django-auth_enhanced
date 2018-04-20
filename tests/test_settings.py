@@ -24,7 +24,7 @@ from .utils.testcases import AuthEnhancedTestCase
 
 @tag('settings')
 class InjectSettingTests(AuthEnhancedTestCase):
-    """These tests target 'inject_setting()'"""
+    """These tests target 'inject_setting()'."""
 
     def test_name_not_uppercase(self):
         """Non-uppercase setting names should be rejected."""
