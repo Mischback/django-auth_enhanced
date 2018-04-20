@@ -3,8 +3,10 @@
 
 # Django imports
 from django.apps import AppConfig
+from django.core.checks import register
 
 # app imports
+from auth_enhanced.checks import check_settings_values
 from auth_enhanced.settings import set_app_default_settings
 
 
@@ -22,4 +24,8 @@ class AuthEnhancedConfig(AppConfig):
     def ready(self):
         """Executed, when application loading is completed."""
 
+        # apply the default settings
         set_app_default_settings()
+
+        # register app-specific system checks
+        register(check_settings_values)

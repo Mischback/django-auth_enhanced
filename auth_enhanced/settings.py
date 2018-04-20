@@ -11,7 +11,7 @@ if not provided through a project's settings module) is done in this app's
 # Django imports
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _  # noqa
 
 # #############################################################################
 # CONSTANTS
