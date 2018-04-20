@@ -55,7 +55,7 @@ def setup(disable_optimisation, enable_migrations, enable_timing, verbosity):
         settings.ALLOWED_HOSTS = []
 
         # only use one password hasher (and the fastest one)
-        settings.PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher',]
+        settings.PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher', ]
 
         # turn off logging
         import logging
