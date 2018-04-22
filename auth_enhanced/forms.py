@@ -60,16 +60,31 @@ class SignupForm(UserCreationForm):
             )
 
         # enforce a unique email address
+        # TODO / FIXME: As of now, this code is already doing things, if the
+        #   email address is a required field, because otherwise this form
+        #   won't handle the email-field, even if specified.
+        #   The below code has to be applied to all forms, that can change a
+        #   User object! How to do this? Write a Mixin / MultiInheritance?
+        # Wondering about this crazy syntax? To keep the app as pluggable as
+        #   possible, the 'email'-field is not referenced directly. But this
+        #   requires to look for the content of that field, but it can't be
+        #   used as keyword-paramter in 'get()'.
+        already_used_email = None
         email_query = {
             self._meta.model.EMAIL_FIELD: email,
         }
         try:
-            foo = self._meta.model.objects.get(**email_query)
+            already_used_email = self._meta.model.objects.get(**email_query)
         except self._meta.model.DoesNotExist:
-            # TODO: if this works, just 'pass' the exception
-            print('Email address does not yet exist! Yeah!')
+            # if the exception is thrown, the email address is not in the database,
+            #   just what is expected/required! Just go on!
+            pass
 
-        if foo:
+        # if the try/except above didn't fail, we have an User-object in
+        #   'already_used_email'. This means, that this email address is already
+        #   in use and may not be registered again.
+        #   Keep in mind to not disclose any more information at this point!
+        if already_used_email:
             raise ValidationError(
                 _('This email address is already in use! Email addresses may only be registered once!'),
                 code='email_not_unique'
