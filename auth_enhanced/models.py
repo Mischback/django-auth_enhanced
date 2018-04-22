@@ -44,7 +44,7 @@ class UserEnhancement(models.Model):
     )
 
     # a reference to the user object
-    user = models.ForeignKey(
+    user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
