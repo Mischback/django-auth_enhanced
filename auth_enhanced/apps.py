@@ -3,7 +3,9 @@
 
 # Django imports
 from django.apps import AppConfig
+from django.conf import settings
 from django.core.checks import register
+from django.db.models.signals import post_save
 
 # app imports
 from auth_enhanced.checks import check_settings_values
@@ -29,3 +31,11 @@ class AuthEnhancedConfig(AppConfig):
 
         # register app-specific system checks
         register(check_settings_values)
+
+        # add a post_save-callback to automatically create a UserEnhancement,
+        #   whenever a User-object is created.
+        post_save.connect(
+            self.get_model('UserEnhancement').callback_create_enhance_user_object,
+            sender=settings.AUTH_USER_MODEL,
+            dispatch_uid='DAE_create_enhance_user_object'
+        )

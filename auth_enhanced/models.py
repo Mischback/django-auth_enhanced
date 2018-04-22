@@ -62,17 +62,21 @@ class UserEnhancement(models.Model):
         return False
 
     @classmethod
-    def callback_create_enhance_user_object(cls, sender, user_obj=None, user_id=None, **kwargs):
+    def callback_create_enhance_user_object(cls, sender, instance, created, user_obj=None, user_id=None, **kwargs):
         """Returns a new instance of UserEnhancement, tied to a User-object"""
 
-        if user_obj:
-            new_enhancement = cls(user=user_obj)
-        elif user_id:
-            try:
-                new_enhancement = cls(user=get_user_model().objects.get(pk=user_id))
-            except get_user_model().DoesNotExist:
-                raise cls.UserEnhancementException(_('The given user id does not exist!'))
-        else:
-            raise cls.UserEnhancementException(_('Could not determine a valid user object!'))
+        # only execute this code on object creation, not on every single save()
+        if created:
+            if instance:
+                new_enhancement = cls(user=instance)
+            elif user_obj:
+                new_enhancement = cls(user=user_obj)
+            elif user_id:
+                try:
+                    new_enhancement = cls(user=get_user_model().objects.get(pk=user_id))
+                except get_user_model().DoesNotExist:
+                    raise cls.UserEnhancementException(_('The given user id does not exist!'))
+            else:
+                raise cls.UserEnhancementException(_('Could not determine a valid user object!'))
 
-        return new_enhancement
+            return new_enhancement
