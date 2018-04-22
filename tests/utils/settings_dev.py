@@ -75,3 +75,10 @@ STATIC_URL = '/static/'
 # this is a minimum test requirement
 SECRET_KEY = 'only-for-testing'
 
+# adjust Django's default setting to this app's login view
+#   Django's default: '/accounts/login/'
+LOGIN_URL = 'auth_enhaced:login'
+
+# if there is no special next parameter after login, show this page
+#   Django's default: '/accounts/profile/'
+LOGIN_REDIRECT_URL = '/'

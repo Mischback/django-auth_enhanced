@@ -9,8 +9,10 @@ TODO: create a 'root-view' under the URL '/', which renders some basic template.
 # Django imports
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.views.generic.base import TemplateView
 
 urlpatterns = [
+    url(r'^$', TemplateView.as_view(template_name='base.html')),
     url(r'^', include('auth_enhanced.urls')),
     url(r'^admin/', admin.site.urls),
 ]

@@ -138,7 +138,27 @@
     </header>
 
     <main class="main-content">
-      {% block 'content' %}base.html:'content'{% endblock 'content' %}
+      {% block 'content' %}
+      <div class="element">
+        <h1 class="atom align-right">django-auth_enhanced</h1>
+        <div class="atom">
+          <p><strong>django-auth_enhanced</strong> is designed to enhance Django's built-in authentication application, by providing additional views, templates and functions.</p>
+        </div>
+        <div class="atom">
+          <a href="https://badge.fury.io/gh/mischback%2Fdjango-auth_enhanced"><img src="https://badge.fury.io/gh/mischback%2Fdjango-auth_enhanced.svg" alt="Version"></a>
+
+          <a href="https://travis-ci.org/Mischback/django-auth_enhanced"><img src="https://travis-ci.org/Mischback/django-auth_enhanced.svg?branch=development" alt="Build Status"></a>
+
+          <a href="https://coveralls.io/github/Mischback/django-auth_enhanced?branch=development"><img src="https://coveralls.io/repos/github/Mischback/django-auth_enhanced/badge.svg?branch=development" alt="Code Coverage"></a>
+
+          <a href="https://www.python.org/dev/peps/pep-0008/"><img src="https://img.shields.io/badge/code%20style-pep8-brightgreen.svg" alt="PEP8 Compliance"></a>
+
+          <a href="https://semver.org/"><img src="https://img.shields.io/badge/semver-2.0-brightgreen.svg" alt="Semantic Versioning 2.0"></a>
+
+          <a href="https://github.com/Mischback/django-auth_enhanced/blob/development/LICENSE"><img src="https://img.shields.io/github/license/mischback/django-auth_enhanced.svg" alt="License"></a>
+        </div>
+      </div>
+      {% endblock 'content' %}
     </main>
 
     <!-- footer -->
