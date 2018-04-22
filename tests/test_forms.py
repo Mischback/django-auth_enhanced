@@ -140,10 +140,10 @@ class SignupFormTests(AuthEnhancedTestCase):
 
         See 'clean()'-method."""
 
-        user = get_user_model().objects.create(**{
-            get_user_model().USERNAME_FIELD: 'django',
-            get_user_model().EMAIL_FIELD: 'foo@localhost'
-        })
+        user = get_user_model().objects.create(**{          # noqa
+            get_user_model().USERNAME_FIELD: 'django',      # noqa
+            get_user_model().EMAIL_FIELD: 'foo@localhost'   # noqa
+        })                                                  # noqa
 
         form = SignupForm(
             data={
@@ -154,4 +154,7 @@ class SignupFormTests(AuthEnhancedTestCase):
             }
         )
         self.assertFalse(form.is_valid())
-        self.assertRaisesMessage(ValidationError, 'This email address is already in use! Email addresses may only be registered once!')
+        self.assertRaisesMessage(
+            ValidationError,
+            'This email address is already in use! Email addresses may only be registered once!'
+        )

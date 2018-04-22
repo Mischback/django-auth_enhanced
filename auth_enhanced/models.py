@@ -12,20 +12,19 @@ pluggable as possible."""
 
 # Django imports
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
+# app imports
+from auth_enhanced.exceptions import AuthEnhancedException
 
 
 class UserEnhancement(models.Model):
     """This class stores all necessary additional data on Django's User objects.
 
     Please note, that this model is meant to be pluggable by using a reference
-    to 'AUTH_USER_MODEL'.
-
-    TODO: How to ensure, that this is unique? Use ono-to-one instead?
-    TODO: How to automatically create this object during user creation? Rely on
-        signals? Rely on our own form class (child of UserCreationForm)?
-    """
+    to 'AUTH_USER_MODEL'."""
 
     EMAIL_VERIFICATION_COMPLETED = 'EMAIL_VERIFICATION_COMPLETED'
     EMAIL_VERIFICATION_IN_PROGRESS = 'EMAIL_VERIFICATION_IN_PROGRESS'
@@ -49,6 +48,10 @@ class UserEnhancement(models.Model):
         on_delete=models.CASCADE,
     )
 
+    class UserEnhancementException(AuthEnhancedException):
+        """This exception indicates, that something went wrong inside this model"""
+        pass
+
     @property
     def email_is_verified(self):
         """Returns a simple boolean value, depending on the 'email_verification_status'"""
@@ -57,3 +60,19 @@ class UserEnhancement(models.Model):
             return True
 
         return False
+
+    @classmethod
+    def callback_create_enhance_user_object(cls, sender, user_obj=None, user_id=None, **kwargs):
+        """Returns a new instance of UserEnhancement, tied to a User-object"""
+
+        if user_obj:
+            new_enhancement = cls(user=user_obj)
+        elif user_id:
+            try:
+                new_enhancement = cls(user=get_user_model().objects.get(pk=user_id))
+            except get_user_model().DoesNotExist:
+                raise cls.UserEnhancementException(_('The given user id does not exist!'))
+        else:
+            raise cls.UserEnhancementException(_('Could not determine a valid user object!'))
+
+        return new_enhancement
