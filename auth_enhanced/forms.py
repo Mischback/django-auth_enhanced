@@ -70,7 +70,10 @@ class SignupForm(UserCreationForm):
             print('Email address does not yet exist! Yeah!')
 
         if foo:
-            print('email address already in use: {}'.format(foo))
+            raise ValidationError(
+                _('This email address is already in use! Email addresses may only be registered once!'),
+                code='email_not_unique'
+            )
 
         # pass the data on
         return cleaned_data

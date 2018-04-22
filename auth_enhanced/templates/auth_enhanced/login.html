@@ -32,7 +32,7 @@
     </div>
 
     <div class="atom align-right">
-      <a href="#">forgot your password?</a> | <a href="#">Registration</a>
+      <a href="#">forgot your password?</a> | <a href="{% url 'auth_enhanced:signup' %}">Signup</a>
     </div>
     {% csrf_token %}
     <input type="hidden" name="next" value="{{ next }}">
