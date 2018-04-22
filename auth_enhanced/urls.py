@@ -12,6 +12,8 @@ may have to adjust your imports accordingly."""
 from django.conf.urls import url
 from django.contrib.auth.views import LoginView, LogoutView
 
+from auth_enhanced.views import SignupView
+
 # specify the app name
 app_name = 'auth_enhanced'
 
@@ -20,4 +22,5 @@ app_name = 'auth_enhanced'
 urlpatterns = [
     url(r'^login/$', LoginView.as_view(template_name='auth_enhanced/login.html'), name='login'),
     url(r'^logout/$', LogoutView.as_view(template_name='auth_enhanced/logout.html'), name='logout'),
+    url(r'^signup/$', SignupView.as_view(), name='signup'),
 ]

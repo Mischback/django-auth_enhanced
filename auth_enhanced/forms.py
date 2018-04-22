@@ -3,7 +3,9 @@
 
 # Django imports
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 # app imports
@@ -15,6 +17,18 @@ class SignupForm(UserCreationForm):
 
     Several things are done here:
         - enforce unique email addresses"""
+
+    class Meta:
+        # be as pluggable as possible, so django.contrib.auth's User is not
+        #   directly referenced
+        # adding 'EMAIL_FIELD' here, but it may be removed in '__init__', if
+        #   the email address is not required
+        model = get_user_model()
+        fields = (
+            model.USERNAME_FIELD,
+            model.EMAIL_FIELD,
+            'password1', 'password2'
+        )
 
     def __init__(self, *args, **kwargs):
         """Custom constructor"""
@@ -54,6 +68,9 @@ class SignupForm(UserCreationForm):
         except self._meta.model.DoesNotExist:
             # TODO: if this works, just 'pass' the exception
             print('Email address does not yet exist! Yeah!')
+
+        if foo:
+            print('email address already in use: {}'.format(foo))
 
         # pass the data on
         return cleaned_data
