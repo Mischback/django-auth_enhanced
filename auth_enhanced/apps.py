@@ -35,7 +35,7 @@ class AuthEnhancedConfig(AppConfig):
         # add a post_save-callback to automatically create a UserEnhancement,
         #   whenever a User-object is created.
         post_save.connect(
-            self.get_model('UserEnhancement').callback_create_enhance_user_object,
+            self.get_model('UserEnhancement').callback_create_enhancement_object,
             sender=settings.AUTH_USER_MODEL,
             dispatch_uid='DAE_create_enhance_user_object'
         )

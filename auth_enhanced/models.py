@@ -46,23 +46,15 @@ class UserEnhancement(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        related_name='enhancement'
     )
 
     class UserEnhancementException(AuthEnhancedException):
         """This exception indicates, that something went wrong inside this model"""
         pass
 
-    @property
-    def email_is_verified(self):
-        """Returns a simple boolean value, depending on the 'email_verification_status'"""
-
-        if self.email_verification_status == self.EMAIL_VERIFICATION_COMPLETED:
-            return True
-
-        return False
-
     @classmethod
-    def callback_create_enhance_user_object(cls, sender, instance, created, user_obj=None, user_id=None, **kwargs):
+    def callback_create_enhancement_object(cls, sender, instance, created, user_obj=None, user_id=None, **kwargs):
         """Returns a new instance of UserEnhancement, tied to a User-object"""
 
         # only execute this code on object creation, not on every single save()
@@ -80,3 +72,14 @@ class UserEnhancement(models.Model):
                 raise cls.UserEnhancementException(_('Could not determine a valid user object!'))
 
             return new_enhancement
+        else:
+            return None
+
+    @property
+    def email_is_verified(self):
+        """Returns a simple boolean value, depending on the 'email_verification_status'"""
+
+        if self.email_verification_status == self.EMAIL_VERIFICATION_COMPLETED:
+            return True
+
+        return False
