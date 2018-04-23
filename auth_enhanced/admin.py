@@ -9,12 +9,14 @@ from django.contrib.admin import ModelAdmin, register
 from auth_enhanced.models import UserEnhancement
 
 
-def register_only_debug(*models, site=None):
+def register_only_debug(*models, **kwargs):
     """Register the given model(s) classes and wrapped ModelAdmin class with
     admin site, if DEBUG=True in project's settings.
 
     See https://github.com/django/django/blob/master/django/contrib/admin/decorators.py
-    for the original Django implementation."""
+    for the original Django implementation.
+
+    TODO: Using '**kwargs' doesn't mimic Django2.0 codebase, but Django1.11!"""
 
     # need a callable here, but just 'pass'ing is fine...
     def _wrapper_noop(admin_class):
@@ -22,7 +24,7 @@ def register_only_debug(*models, site=None):
 
     if settings.DEBUG:
         # re-use Django's register-decorator
-        return register(*models, site=site)
+        return register(*models, **kwargs)
 
     # return a noop
     return _wrapper_noop
