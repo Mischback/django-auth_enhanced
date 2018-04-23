@@ -30,9 +30,9 @@ class UserEnhancement(models.Model):
     EMAIL_VERIFICATION_IN_PROGRESS = 'EMAIL_VERIFICATION_IN_PROGRESS'
     EMAIL_VERIFICATION_FAILED = 'EMAIL_VERIFICATION_FAILED'
     EMAIL_VERIFICATION_STATUS = (
-        (EMAIL_VERIFICATION_COMPLETED, _("")),
-        (EMAIL_VERIFICATION_IN_PROGRESS, _("")),
-        (EMAIL_VERIFICATION_FAILED, _(""))
+        (EMAIL_VERIFICATION_COMPLETED, _('Email verification completed')),
+        (EMAIL_VERIFICATION_IN_PROGRESS, _('Email verification in progress')),
+        (EMAIL_VERIFICATION_FAILED, _('Email verification failed'))
     )
 
     # the actual verification status
@@ -48,6 +48,14 @@ class UserEnhancement(models.Model):
         on_delete=models.CASCADE,
         related_name='enhancement'
     )
+
+    class Meta:
+        verbose_name = _('User Enhancement')
+        verbose_name_plural = _('User Enhancements')
+
+    def __str__(self):
+        """Provides the string representation of these objects."""
+        return "Enhancement of '{}'".format(self.user.get_username())   # pragma: nocover
 
     class UserEnhancementException(AuthEnhancedException):
         """This exception indicates, that something went wrong inside this model"""
@@ -71,6 +79,7 @@ class UserEnhancement(models.Model):
             else:
                 raise cls.UserEnhancementException(_('Could not determine a valid user object!'))
 
+            new_enhancement.save()
             return new_enhancement
         else:
             return None
