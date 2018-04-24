@@ -25,11 +25,21 @@ E001 = Error(
     _("'DAE_OPERATION_MODE' is set to an invalid value!"),
     hint=_(
         "Please check your settings and ensure, that 'DAE_OPERATION_MODE' is "
-        "set to one of the following values: '{}', '{}' or '{}'".format(
+        "set to one of the following values: '{}', '{}' or '{}'.".format(
             DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_MODE_EMAIL_ACTIVATION, DAE_CONST_MODE_MANUAL_ACTIVATION
         )
     ),
     id='dae.e001'
+)
+
+# DAE_EMAIL_TEMPLATE_PREFIX
+E002 = Error(
+    _("'DAE_EMAIL_TEMPLATE_PREFIX' must not have a trailing slash!"),
+    hint=_(
+        "Please check your settings and ensure, that 'DAE_EMAIL_TEMPLATE_PREFIX' "
+        "does not end with a slash ('/')."
+    ),
+    id='dae.e002'
 )
 
 
@@ -43,6 +53,10 @@ def check_settings_values(app_configs, **kwargs):
         DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_MODE_EMAIL_ACTIVATION, DAE_CONST_MODE_MANUAL_ACTIVATION
     ):
         errors.append(E001)
+
+    # DAE_EMAIL_TEMPLATE_PREFIX
+    if settings.DAE_EMAIL_TEMPLATE_PREFIX[-1:] == '/':
+        errors.append(E002)
 
     # and now hope, this is still empty! ;)
     return errors

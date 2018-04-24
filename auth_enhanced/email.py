@@ -3,6 +3,7 @@
 
 
 # Django imports
+from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
@@ -37,12 +38,12 @@ class AuthEnhancedEmail(EmailMultiAlternatives):
             raise self.AuthEnhancedEmailException(_("A 'context' must be provided!"))
 
         # render and attach the 'txt_body'
-        txt_body = render_to_string('auth_enhanced/mail/{}'.format(txt_template), context)
+        txt_body = render_to_string('{}/{}'.format(settings.DAE_EMAIL_TEMPLATE_PREFIX, txt_template), context)
         self.body = txt_body
 
         # render an alternative 'html_body'
         if html_template:
-            html_body = render_to_string('auth_enhanced/mail/{}'.format(html_template), context)
+            html_body = render_to_string('{}/{}'.format(settings.DAE_EMAIL_TEMPLATE_PREFIX, html_template), context)
             self.attach_alternative(html_body, 'text/html')
 
     class AuthEnhancedEmailException(AuthEnhancedException):
