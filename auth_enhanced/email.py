@@ -34,7 +34,7 @@ class AuthEnhancedEmail(EmailMultiAlternatives):
 
         # check for context (required for rendering)
         # TODO: Can this be handled more graceful? I.e by defaulting 'context' to {}?
-        if context is not None and not isinstance(context, dict):
+        if context is None or not isinstance(context, dict):
             raise self.AuthEnhancedEmailException(_("A 'context' must be provided!"))
 
         # render and attach the 'txt_body'
