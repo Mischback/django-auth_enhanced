@@ -16,8 +16,8 @@ from django.utils.translation import ugettext_lazy as _
 
 # app imports
 from auth_enhanced.settings import (
-    DAE_MODE_AUTO_ACTIVATION, DAE_MODE_EMAIL_ACTIVATION,
-    DAE_MODE_MANUAL_ACTIVATION,
+    DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_MODE_EMAIL_ACTIVATION,
+    DAE_CONST_MODE_MANUAL_ACTIVATION,
 )
 
 # DAE_OPERATION_MODE
@@ -26,7 +26,7 @@ E001 = Error(
     hint=_(
         "Please check your settings and ensure, that 'DAE_OPERATION_MODE' is "
         "set to one of the following values: '{}', '{}' or '{}'".format(
-            DAE_MODE_AUTO_ACTIVATION, DAE_MODE_EMAIL_ACTIVATION, DAE_MODE_MANUAL_ACTIVATION
+            DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_MODE_EMAIL_ACTIVATION, DAE_CONST_MODE_MANUAL_ACTIVATION
         )
     ),
     id='dae.e001'
@@ -40,7 +40,7 @@ def check_settings_values(app_configs, **kwargs):
 
     # DAE_OPERATION_MODE
     if settings.DAE_OPERATION_MODE not in (
-        DAE_MODE_AUTO_ACTIVATION, DAE_MODE_EMAIL_ACTIVATION, DAE_MODE_MANUAL_ACTIVATION
+        DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_MODE_EMAIL_ACTIVATION, DAE_CONST_MODE_MANUAL_ACTIVATION
     ):
         errors.append(E001)
 

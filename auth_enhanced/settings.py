@@ -18,21 +18,21 @@ from django.utils.translation import ugettext_lazy as _  # noqa
 # #############################################################################
 
 # This mode will automatically activate newly registered accounts
-DAE_MODE_AUTO_ACTIVATION = 'DAE_MODE_AUTO_ACTIVATION'
+DAE_CONST_MODE_AUTO_ACTIVATION = 'DAE_CONST_MODE_AUTO_ACTIVATION'
 
 # This mode sends a verification email and will automaticall activate the
 #   newly registered account after successfull verification
-DAE_MODE_EMAIL_ACTIVATION = 'DAE_MODE_EMAIL_ACTIVATION'
+DAE_CONST_MODE_EMAIL_ACTIVATION = 'DAE_CONST_MODE_EMAIL_ACTIVATION'
 
 # This mode will *NOT* activate newly registered accounts and relies on manual
 #   activation by a superuser
-DAE_MODE_MANUAL_ACTIVATION = 'DAE_MODE_MANUAL_ACTIVATION'
+DAE_CONST_MODE_MANUAL_ACTIVATION = 'DAE_CONST_MODE_MANUAL_ACTIVATION'
 
 # contains the app's operation modes to be used in a model (choices) field
 # DAE_OPERATION_MODE_CHOICES = (
-#     (DAE_MODE_AUTO_ACTIVATION, _('Automatic activation')),
-#     (DAE_MODE_MANUAL_ACTIVATION, _('Manual activation')),
-#     (DAE_MODE_EMAIL_ACTIVATION, _('EMail activation')),
+#     (DAE_CONST_MODE_AUTO_ACTIVATION, _('Automatic activation')),
+#     (DAE_CONST_MODE_MANUAL_ACTIVATION, _('Manual activation')),
+#     (DAE_CONST_MODE_EMAIL_ACTIVATION, _('EMail activation')),
 # )
 
 
@@ -73,4 +73,4 @@ def set_app_default_settings():
     #   DAE_MODE_MANUAL_ACTIVATION
     #       - this mode will *NOT* activate newly registered accounts and
     #           relies on manual activation by a superuser
-    inject_setting('DAE_OPERATION_MODE', DAE_MODE_AUTO_ACTIVATION)
+    inject_setting('DAE_OPERATION_MODE', DAE_CONST_MODE_AUTO_ACTIVATION)

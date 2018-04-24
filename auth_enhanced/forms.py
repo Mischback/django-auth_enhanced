@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 # app imports
 from auth_enhanced.settings import (
-    DAE_MODE_EMAIL_ACTIVATION, DAE_MODE_MANUAL_ACTIVATION,
+    DAE_CONST_MODE_EMAIL_ACTIVATION, DAE_CONST_MODE_MANUAL_ACTIVATION,
 )
 
 
@@ -39,7 +39,7 @@ class SignupForm(UserCreationForm):
         super(SignupForm, self).__init__(*args, **kwargs)
 
         # if the email address is not mandatorily required, remove it from the form
-        if not settings.DAE_OPERATION_MODE == DAE_MODE_EMAIL_ACTIVATION:
+        if not settings.DAE_OPERATION_MODE == DAE_CONST_MODE_EMAIL_ACTIVATION:
             del self.fields[self._meta.model.EMAIL_FIELD]
 
     def clean(self):
@@ -55,7 +55,7 @@ class SignupForm(UserCreationForm):
         email = cleaned_data.get(self._meta.model.EMAIL_FIELD)
 
         # enfoce a valid email address (if required)
-        if settings.DAE_OPERATION_MODE == DAE_MODE_EMAIL_ACTIVATION and not email:
+        if settings.DAE_OPERATION_MODE == DAE_CONST_MODE_EMAIL_ACTIVATION and not email:
             raise ValidationError(
                 _('A valid email address is required!'),
                 code='valid_email_required'
@@ -103,7 +103,7 @@ class SignupForm(UserCreationForm):
         user = super(SignupForm, self).save(commit=False)
 
         # 'DAE_MODE_MANUAL_ACTIVATION' implies 'is_active' = False
-        if settings.DAE_OPERATION_MODE == DAE_MODE_MANUAL_ACTIVATION:
+        if settings.DAE_OPERATION_MODE == DAE_CONST_MODE_MANUAL_ACTIVATION:
             user.is_active = False
 
         if commit:

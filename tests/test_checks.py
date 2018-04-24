@@ -14,7 +14,7 @@ from django.test import override_settings, tag  # noqa
 
 # app imports
 from auth_enhanced.checks import E001, check_settings_values
-from auth_enhanced.settings import DAE_MODE_AUTO_ACTIVATION
+from auth_enhanced.settings import DAE_CONST_MODE_AUTO_ACTIVATION
 
 # app imports
 from .utils.testcases import AuthEnhancedTestCase
@@ -24,7 +24,7 @@ from .utils.testcases import AuthEnhancedTestCase
 class CheckSettingsValuesTests(AuthEnhancedTestCase):
     """These tests target 'check_settings_values()'."""
 
-    @override_settings(DAE_OPERATION_MODE=DAE_MODE_AUTO_ACTIVATION)
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_AUTO_ACTIVATION)
     def test_e001_valid(self):
         """Check should accept valid values."""
         errors = check_settings_values(None)
