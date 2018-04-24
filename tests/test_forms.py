@@ -158,3 +158,70 @@ class SignupFormTests(AuthEnhancedTestCase):
             ValidationError,
             'This email address is already in use! Email addresses may only be registered once!'
         )
+
+    @override_settings(DAE_OPERATION_MODE='DAE_MODE_AUTO_ACTIVATION')
+    def test_save_no_commit(self):
+        """SignupForm's 'save()'-method may be called without commiting.
+
+        See 'save()'-method.
+
+        While an 'override_settings()' is used, it is not really needed here
+        and shall only ensure, that the form can be created like below. That's
+        the reason, why this test is not tagged."""
+
+        form = SignupForm(
+            data={
+                get_user_model().USERNAME_FIELD: 'foo',
+                'password1': 'foo',
+                'password2': 'foo'
+            }
+        )
+        self.assertTrue(form.is_valid())
+
+        user = form.save(commit=False)  # noqa
+
+        # it should not be possible to fetch the user from the DB
+        with self.assertRaises(get_user_model().DoesNotExist):
+            db_user = get_user_model().objects.get(**{      # noqa
+                get_user_model().USERNAME_FIELD: 'foo',     # noqa
+            })                                              # noqa
+
+    @tag('settings', 'setting_operation_mode')
+    @override_settings(DAE_OPERATION_MODE='DAE_MODE_AUTO_ACTIVATION')
+    def test_save_is_active_auto_true(self):
+        """If 'DAE_OPERATION_MODE' is set to automatic activation, the user
+        object is created with 'is_active' = False.
+
+        See 'save()'-method."""
+
+        form = SignupForm(
+            data={
+                get_user_model().USERNAME_FIELD: 'foo',
+                'password1': 'foo',
+                'password2': 'foo'
+            }
+        )
+        self.assertTrue(form.is_valid())
+
+        user = form.save()
+        self.assertTrue(user.is_active)
+
+    @tag('settings', 'setting_operation_mode')
+    @override_settings(DAE_OPERATION_MODE='DAE_MODE_MANUAL_ACTIVATION')
+    def test_save_is_active_auto_false(self):
+        """Depending on the 'DAE_OPERATION_MODE'-setting the user object is
+        created with 'is_active' = False.
+
+        See 'save()'-method."""
+
+        form = SignupForm(
+            data={
+                get_user_model().USERNAME_FIELD: 'foo',
+                'password1': 'foo',
+                'password2': 'foo'
+            }
+        )
+        self.assertTrue(form.is_valid())
+
+        user = form.save()
+        self.assertFalse(user.is_active)

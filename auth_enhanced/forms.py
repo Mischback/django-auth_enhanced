@@ -9,7 +9,9 @@ from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 # app imports
-from auth_enhanced.settings import DAE_MODE_EMAIL_ACTIVATION
+from auth_enhanced.settings import (
+    DAE_MODE_EMAIL_ACTIVATION, DAE_MODE_MANUAL_ACTIVATION,
+)
 
 
 class SignupForm(UserCreationForm):
@@ -92,3 +94,19 @@ class SignupForm(UserCreationForm):
 
         # pass the data on
         return cleaned_data
+
+    def save(self, commit=True):
+        """This method ensures, that the 'is_active'-flag is filled according
+        to the app's settings."""
+
+        # call the parent's 'save()' without saving
+        user = super(SignupForm, self).save(commit=False)
+
+        # 'DAE_MODE_MANUAL_ACTIVATION' implies 'is_active' = False
+        if settings.DAE_OPERATION_MODE == DAE_MODE_MANUAL_ACTIVATION:
+            user.is_active = False
+
+        if commit:
+            user.save()
+
+        return user

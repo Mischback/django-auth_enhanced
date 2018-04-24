@@ -12,6 +12,7 @@ may have to adjust your imports accordingly."""
 from django.conf.urls import url
 from django.contrib.auth.views import LoginView, LogoutView
 
+# app imports
 from auth_enhanced.views import SignupView
 
 # specify the app name
