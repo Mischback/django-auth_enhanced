@@ -40,6 +40,8 @@ DAE_CONST_MODE_MANUAL_ACTIVATION = 'DAE_CONST_MODE_MANUAL_ACTIVATION'
 #     (DAE_CONST_MODE_EMAIL_ACTIVATION, _('EMail activation')),
 # )
 
+DAE_CONST_RECOMMENDED_LOGIN_URL = 'auth_enhanced:login'
+
 
 # #############################################################################
 # FUNCTIONS

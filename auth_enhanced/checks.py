@@ -11,13 +11,13 @@ There are two different types of checks:
 
 # Django imports
 from django.conf import settings
-from django.core.checks import Error
+from django.core.checks import Error, Warning
 from django.utils.translation import ugettext_lazy as _
 
 # app imports
 from auth_enhanced.settings import (
     DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_MODE_EMAIL_ACTIVATION,
-    DAE_CONST_MODE_MANUAL_ACTIVATION,
+    DAE_CONST_MODE_MANUAL_ACTIVATION, DAE_CONST_RECOMMENDED_LOGIN_URL
 )
 
 # DAE_OPERATION_MODE
@@ -42,6 +42,17 @@ E002 = Error(
     id='dae.e002'
 )
 
+# LOGIN_URL (Django settings)
+W001 = Warning(
+    _("'LOGIN_URL' does not point to the login url provided by 'django-auth_enhanced'."),
+    hint=_(
+        "The suggested value for 'LOGIN_URL' is '{}', which "
+        "provides the built-in login view. If you set another login url on "
+        "purpose, you can safely ignore this setting.".format(DAE_CONST_RECOMMENDED_LOGIN_URL)
+    ),
+    id='dae.w001'
+)
+
 
 def check_settings_values(app_configs, **kwargs):
     """Checks, if the app-specific settings have valid values."""
@@ -57,6 +68,10 @@ def check_settings_values(app_configs, **kwargs):
     # DAE_EMAIL_TEMPLATE_PREFIX
     if settings.DAE_EMAIL_TEMPLATE_PREFIX[-1:] == '/':
         errors.append(E002)
+
+    # LOGIN_URL (Django settings)
+    if settings.LOGIN_URL != DAE_CONST_RECOMMENDED_LOGIN_URL:
+        errors.append(W001)
 
     # and now hope, this is still empty! ;)
     return errors

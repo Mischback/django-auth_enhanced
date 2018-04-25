@@ -13,8 +13,8 @@ from unittest import skip  # noqa
 from django.test import override_settings, tag  # noqa
 
 # app imports
-from auth_enhanced.checks import E001, E002, check_settings_values
-from auth_enhanced.settings import DAE_CONST_MODE_AUTO_ACTIVATION
+from auth_enhanced.checks import E001, E002, check_settings_values, W001
+from auth_enhanced.settings import DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_RECOMMENDED_LOGIN_URL
 
 # app imports
 from .utils.testcases import AuthEnhancedTestCase
@@ -47,3 +47,15 @@ class CheckSettingsValuesTests(AuthEnhancedTestCase):
         """Invalid values show an error message."""
         errors = check_settings_values(None)
         self.assertEqual(errors, [E002])
+
+    @override_settings(LOGIN_URL=DAE_CONST_RECOMMENDED_LOGIN_URL)
+    def test_w001_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(LOGIN_URL='foo/')
+    def test_w001_invalid(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [W001])
