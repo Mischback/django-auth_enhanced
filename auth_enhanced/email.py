@@ -4,7 +4,7 @@
 
 # Django imports
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives, get_connection
 from django.template.exceptions import TemplateDoesNotExist
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
@@ -65,4 +65,39 @@ def admin_information_new_signup(sender, instance, created, **kwargs):
 
     This function acts like a callback to a 'post_save'-signal."""
 
-    print('[!] sending mail to admins...')
+    # only send email on new registration
+    if created:
+
+        # set the email subject
+        mail_subject = 'New Signup Notification'
+        if settings.DAE_ADMIN_NOTIFICATION_PREFIX:
+            mail_subject = '[{}] {}'.format(settings.DAE_ADMIN_NOTIFICATION_PREFIX, mail_subject)
+
+        # prepare the recipient list
+        mail_to = [(x[0], x[1]) for x in settings.DAE_ADMIN_SIGNUP_NOTIFICATION if 'mail' in x[2]]
+
+        # TODO: prepare the context
+        mail_context = {
+            'new_user': instance.username
+        }
+
+        # create the email objects
+        mails = []
+        for m in mail_to:
+            # add the username to the context
+            loop_mail_context = mail_context
+            loop_mail_context['admin_name'] = m[0]
+
+            mails.append(
+                AuthEnhancedEmail(
+                    template_name='admin_signup_notification',
+                    context=loop_mail_context,
+                    subject=mail_subject,
+                    from_email=settings.DAE_EMAIL_FROM_ADDRESS,
+                    to=(m[1], )
+                )
+            )
+
+        # get an email connection
+        connection = get_connection()
+        connection.send_messages(mails)
