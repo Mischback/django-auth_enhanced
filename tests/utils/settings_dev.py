@@ -82,3 +82,6 @@ LOGIN_URL = 'auth_enhanced:login'
 # if there is no special next parameter after login, show this page
 #   Django's default: '/accounts/profile/'
 LOGIN_REDIRECT_URL = '/'
+
+# just for development. Doesn't work for tests (locmem?)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

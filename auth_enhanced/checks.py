@@ -48,9 +48,21 @@ W001 = Warning(
     hint=_(
         "The suggested value for 'LOGIN_URL' is '{}', which "
         "provides the built-in login view. If you set another login url on "
-        "purpose, you can safely ignore this setting.".format(DAE_CONST_RECOMMENDED_LOGIN_URL)
+        "purpose, you can safely ignore this warning.".format(DAE_CONST_RECOMMENDED_LOGIN_URL)
     ),
     id='dae.w001'
+)
+
+# mail settings
+W002 = Warning(
+    _("Your email settings are identical to Django's default values!"),
+    hint=_(
+        "While it may absolutely be possible to run your Django project with "
+        "these settings, it seems unlikely. If you keep receiving exceptions "
+        "while running 'django-auth_enhanced', please check your settings. "
+        "If everything works just fine, you can safely ignore this warning."
+    ),
+    id='dae.w002'
 )
 
 
@@ -72,6 +84,22 @@ def check_settings_values(app_configs, **kwargs):
     # LOGIN_URL (Django settings)
     if settings.LOGIN_URL != DAE_CONST_RECOMMENDED_LOGIN_URL:
         errors.append(W001)
+
+    # mail settings
+    #   This check is somehow fuzzy. Basically it checks, if all email-related
+    #   settings are still at their provided default values. This *may*
+    #   indicate, that the settings do not work.
+    if ((settings.EMAIL_HOST == 'localhost')
+        and (settings.EMAIL_PORT == 25)
+        and (settings.EMAIL_HOST_USER == '')
+        and (settings.EMAIL_HOST_PASSWORD == '')
+        and (settings.EMAIL_USE_TLS == False)
+        and (settings.EMAIL_USE_SSL == False)
+        and (settings.EMAIL_TIMEOUT == None)
+        and (settings.EMAIL_SSL_KEYFILE == None)
+        and (settings.EMAIL_SSL_CERTFILE == None)
+        and (settings.EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend')):
+        errors.append(W002)
 
     # and now hope, this is still empty! ;)
     return errors

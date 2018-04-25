@@ -13,7 +13,7 @@ from unittest import skip  # noqa
 from django.test import override_settings, tag  # noqa
 
 # app imports
-from auth_enhanced.checks import E001, E002, check_settings_values, W001
+from auth_enhanced.checks import E001, E002, check_settings_values, W001, W002
 from auth_enhanced.settings import DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_RECOMMENDED_LOGIN_URL
 
 # app imports
@@ -59,3 +59,20 @@ class CheckSettingsValuesTests(AuthEnhancedTestCase):
         """Invalid values show an error message."""
         errors = check_settings_values(None)
         self.assertEqual(errors, [W001])
+
+    @override_settings(
+        EMAIL_HOST='localhost',
+        EMAIL_PORT=25,
+        EMAIL_HOST_USER='',
+        EMAIL_HOST_PASSWORD='',
+        EMAIL_USE_TLS=False,
+        EMAIL_USE_SSL=False,
+        EMAIL_TIMEOUT=None,
+        EMAIL_SSL_KEYFILE=None,
+        EMAIL_SSL_CERTFILE=None,
+        EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+    )
+    def test_w002_invalid(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [W002])
