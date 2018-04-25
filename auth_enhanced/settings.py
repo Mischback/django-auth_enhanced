@@ -40,6 +40,7 @@ DAE_CONST_MODE_MANUAL_ACTIVATION = 'DAE_CONST_MODE_MANUAL_ACTIVATION'
 #     (DAE_CONST_MODE_EMAIL_ACTIVATION, _('EMail activation')),
 # )
 
+# the name of the login url, as specified in 'urls.py'
 DAE_CONST_RECOMMENDED_LOGIN_URL = 'auth_enhanced:login'
 
 
@@ -67,6 +68,21 @@ def inject_setting(name, default_value):
 
 def set_app_default_settings():
     """Sets all app-specific default settings."""
+
+    # ### DAE_ADMIN_SIGNUP_NOTIFICATION
+    # This setting controls, if emails will be sent to specified superusers/
+    #   admins whenever a new user signs up.
+    # Possible values:
+    #   False
+    #       - no emails will be sent (default value)
+    #   List of tuples of the following form
+    #       - (USERNAME, EMAIL_ADDRESS, (NOTIFICATION_METHOD, )),
+    #       - ('django', 'django@localhost', ('mail', )),
+    #           USERNAME must be a valid username of this Django project
+    #           EMAIL_ADDRESS must be the verified email address of that user
+    #           (NOTIFICATION_METHOD, ) must be a tuple containing supported
+    #               notification methods. As of now, only 'mail' is supported
+    inject_setting('DAE_ADMIN_SIGNUP_NOTIFICATION', False)
 
     # ### DAE_EMAIL_TEMPLATE_PREFIX
     # This setting determines the place to look for mail templates.

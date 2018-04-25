@@ -12,6 +12,8 @@ There are two different types of checks:
 # Django imports
 from django.conf import settings
 from django.core.checks import Error, Warning
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.utils.translation import ugettext_lazy as _
 
 # app imports
@@ -40,6 +42,20 @@ E002 = Error(
         "does not end with a slash ('/')."
     ),
     id='dae.e002'
+)
+
+# DAE_ADMIN_SIGNUP_NOTIFICATION
+E003 = Error(
+    _("'DAE_ADMIN_SIGNUP_NOTIFICATION' is set to an invalid value!"),
+    hint=_(
+        "Please check your settings and ensure, that 'DAE_ADMIN_SIGNUP_NOTIFICATION' "
+        "is either set to boolean 'False' or a list of tuples, following the "
+        "form of '(USERNAME, EMAIL_ADDRESS, (NOTIFICATION_METHOD, )),', where "
+        "USERNAME is a valid username, EMAIL_ADDRESS the corresponding and "
+        "verified email address and a tuple of supported NOTIFICATION_METHODs. "
+        "Currently supported method is 'mail'."
+    ),
+    id='dae.e003'
 )
 
 # LOGIN_URL (Django settings)
@@ -80,6 +96,31 @@ def check_settings_values(app_configs, **kwargs):
     # DAE_EMAIL_TEMPLATE_PREFIX
     if settings.DAE_EMAIL_TEMPLATE_PREFIX[-1:] == '/':
         errors.append(E002)
+
+    # DAE_ADMIN_SIGNUP_NOTIFICATION
+    #   This needs a little more effort, because the structure and the values
+    #   inside of the structure need attention.
+    #   The 'e03' controls, if the error has to be raised; this is not like the
+    #   most elegant way, but it works...
+    e03 = False
+    if (isinstance(settings.DAE_ADMIN_SIGNUP_NOTIFICATION, bool)):
+        if settings.DAE_ADMIN_SIGNUP_NOTIFICATION is True:
+            e03 = True
+    else:
+        for tup in settings.DAE_ADMIN_SIGNUP_NOTIFICATION:
+            try:
+                validate_email(tup[1])
+            except (IndexError, ValidationError):
+                e03 = True
+                break
+            for method in tup[2]:
+                # this is the place to list available methods of notification
+                if method not in ('mail'):
+                    e03 = True
+                    break
+    # append 'E003' if any error was found
+    if e03:
+        errors.append(E003)
 
     # LOGIN_URL (Django settings)
     if settings.LOGIN_URL != DAE_CONST_RECOMMENDED_LOGIN_URL:

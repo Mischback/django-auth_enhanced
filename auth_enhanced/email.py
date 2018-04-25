@@ -58,3 +58,11 @@ class AuthEnhancedEmail(EmailMultiAlternatives):
     class AuthEnhancedEmailException(AuthEnhancedException):
         """This exception indicates, that something went wrong inside the class."""
         pass
+
+
+def admin_information_new_signup(sender, instance, created, **kwargs):
+    """Sends an email to specified admins to inform them of a new signup.
+
+    This function acts like a callback to a 'post_save'-signal."""
+
+    print('[!] sending mail to admins...')
