@@ -17,7 +17,7 @@ from django.utils.translation import ugettext_lazy as _
 # app imports
 from auth_enhanced.settings import (
     DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_MODE_EMAIL_ACTIVATION,
-    DAE_CONST_MODE_MANUAL_ACTIVATION, DAE_CONST_RECOMMENDED_LOGIN_URL
+    DAE_CONST_MODE_MANUAL_ACTIVATION, DAE_CONST_RECOMMENDED_LOGIN_URL,
 )
 
 # DAE_OPERATION_MODE
@@ -89,16 +89,18 @@ def check_settings_values(app_configs, **kwargs):
     #   This check is somehow fuzzy. Basically it checks, if all email-related
     #   settings are still at their provided default values. This *may*
     #   indicate, that the settings do not work.
-    if ((settings.EMAIL_HOST == 'localhost')
-        and (settings.EMAIL_PORT == 25)
-        and (settings.EMAIL_HOST_USER == '')
-        and (settings.EMAIL_HOST_PASSWORD == '')
-        and (settings.EMAIL_USE_TLS == False)
-        and (settings.EMAIL_USE_SSL == False)
-        and (settings.EMAIL_TIMEOUT == None)
-        and (settings.EMAIL_SSL_KEYFILE == None)
-        and (settings.EMAIL_SSL_CERTFILE == None)
-        and (settings.EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend')):
+    if (
+        (settings.EMAIL_HOST == 'localhost') and
+        (settings.EMAIL_PORT == 25) and
+        (settings.EMAIL_HOST_USER == '') and
+        (settings.EMAIL_HOST_PASSWORD == '') and
+        (settings.EMAIL_USE_TLS is False) and
+        (settings.EMAIL_USE_SSL is False) and
+        (settings.EMAIL_TIMEOUT is None) and
+        (settings.EMAIL_SSL_KEYFILE is None) and
+        (settings.EMAIL_SSL_CERTFILE is None) and
+        (settings.EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend')
+    ):
         errors.append(W002)
 
     # and now hope, this is still empty! ;)

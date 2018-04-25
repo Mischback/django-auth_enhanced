@@ -13,8 +13,10 @@ from unittest import skip  # noqa
 from django.test import override_settings, tag  # noqa
 
 # app imports
-from auth_enhanced.checks import E001, E002, check_settings_values, W001, W002
-from auth_enhanced.settings import DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_RECOMMENDED_LOGIN_URL
+from auth_enhanced.checks import E001, E002, W001, W002, check_settings_values
+from auth_enhanced.settings import (
+    DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_RECOMMENDED_LOGIN_URL,
+)
 
 # app imports
 from .utils.testcases import AuthEnhancedTestCase
