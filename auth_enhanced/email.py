@@ -12,6 +12,10 @@ from django.utils.translation import ugettext_lazy as _
 
 # app imports
 from auth_enhanced.exceptions import AuthEnhancedException
+from auth_enhanced.settings import (
+    DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_MODE_EMAIL_ACTIVATION,
+    DAE_CONST_MODE_MANUAL_ACTIVATION,
+)
 
 
 class AuthEnhancedEmail(EmailMultiAlternatives):
@@ -42,7 +46,7 @@ class AuthEnhancedEmail(EmailMultiAlternatives):
         try:
             txt_template = '{}/{}.txt'.format(settings.DAE_EMAIL_TEMPLATE_PREFIX, template_name)
             txt_body = render_to_string(txt_template, context)
-            self.body = txt_body
+            self.body = txt_body.strip()
         except TemplateDoesNotExist:
             # do stuff here!
             raise self.AuthEnhancedEmailException(_("You have to provide a text template '{}'.".format(txt_template)))
@@ -93,6 +97,13 @@ def admin_information_new_signup(sender, instance, created, **kwargs):
             'user_model': get_user_model()._meta,
             'webmaster_email': settings.DAE_EMAIL_FROM_ADDRESS,
         }
+
+        if settings.DAE_OPERATION_MODE == DAE_CONST_MODE_AUTO_ACTIVATION:
+            mail_context['mode_auto'] = True
+        elif settings.DAE_OPERATION_MODE == DAE_CONST_MODE_EMAIL_ACTIVATION:
+            mail_context['mode_email'] = True
+        elif settings.DAE_OPERATION_MODE == DAE_CONST_MODE_MANUAL_ACTIVATION:
+            mail_context['mode_manual'] = True
 
         # create the email objects
         mails = []
