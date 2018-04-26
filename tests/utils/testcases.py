@@ -2,8 +2,15 @@
 """Contains base classes for test cases"""
 
 # Django imports
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db.models.signals import post_save
 from django.test import TestCase
 from django.urls import resolve
+
+# app imports
+from auth_enhanced.email import callback_admin_information_new_signup
+from auth_enhanced.models import UserEnhancement
 
 
 class AuthEnhancedTestCase(TestCase):
@@ -11,7 +18,51 @@ class AuthEnhancedTestCase(TestCase):
     pass
 
 
-class AEUrlTestCase(AuthEnhancedTestCase):
+class AuthEnhancedNoSignalsTestCase(AuthEnhancedTestCase):
+    """This test class disconnects all of the app's signal handlers."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Prepare the test environment by disconnecting signal handlers"""
+
+        # call parent setUpClass
+        super(AuthEnhancedNoSignalsTestCase, cls).setUpClass()
+
+        # isolate the callback-method by disconnecting the signal handler
+        post_save.disconnect(
+            UserEnhancement.callback_create_enhancement_object,
+            sender=get_user_model(),
+            dispatch_uid='DAE_create_enhance_user_object'
+        )
+
+        post_save.disconnect(
+            callback_admin_information_new_signup,
+            sender=get_user_model(),
+            dispatch_uid='DAE_admin_information_new_signup'
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        """Restore the test environment."""
+
+        post_save.connect(
+            UserEnhancement.callback_create_enhancement_object,
+            sender=get_user_model(),
+            dispatch_uid='DAE_create_enhance_user_object'
+        )
+
+        if settings.DAE_ADMIN_SIGNUP_NOTIFICATION:
+            post_save.connect(
+                callback_admin_information_new_signup,
+                sender=get_user_model(),
+                dispatch_uid='DAE_admin_information_new_signup'
+            )
+
+        # call the parent tearDownClass
+        super(AuthEnhancedNoSignalsTestCase, cls).tearDownClass()
+
+
+class AEUrlTestCase(AuthEnhancedNoSignalsTestCase):
     """Test cases for URL configuration
 
     Provides an additional assert()-method, 'assertCBVName' to check, if an url

@@ -9,7 +9,7 @@ from django.db.models.signals import post_save
 
 # app imports
 from auth_enhanced.checks import check_settings_values
-from auth_enhanced.email import admin_information_new_signup
+from auth_enhanced.email import callback_admin_information_new_signup
 from auth_enhanced.settings import set_app_default_settings
 
 
@@ -47,7 +47,7 @@ class AuthEnhancedConfig(AppConfig):
         #   setting is not False.
         if settings.DAE_ADMIN_SIGNUP_NOTIFICATION:
             post_save.connect(
-                admin_information_new_signup,
+                callback_admin_information_new_signup,
                 sender=settings.AUTH_USER_MODEL,
                 dispatch_uid='DAE_admin_information_new_signup'
             )

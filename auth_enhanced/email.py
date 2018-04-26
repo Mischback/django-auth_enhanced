@@ -65,7 +65,7 @@ class AuthEnhancedEmail(EmailMultiAlternatives):
         pass
 
 
-def admin_information_new_signup(sender, instance, created, **kwargs):
+def callback_admin_information_new_signup(sender, instance, created, **kwargs):
     """Sends an email to specified admins to inform them of a new signup.
 
     This function acts like a callback to a 'post_save'-signal."""

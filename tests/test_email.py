@@ -15,11 +15,11 @@ from django.test import override_settings, tag  # noqa
 from auth_enhanced.email import AuthEnhancedEmail
 
 # app imports
-from .utils.testcases import AuthEnhancedTestCase
+from .utils.testcases import AuthEnhancedNoSignalsTestCase
 
 
 @tag('email')
-class AuthEnhancedEmailTests(AuthEnhancedTestCase):
+class AuthEnhancedEmailTests(AuthEnhancedNoSignalsTestCase):
     """These tests target the base class for app-specific email objects."""
 
     def test_init_template_name_required(self):
@@ -70,3 +70,9 @@ class AuthEnhancedEmailTests(AuthEnhancedTestCase):
         only_txt_template = 'test_only_txt'
         mail = AuthEnhancedEmail(template_name=only_txt_template)
         self.assertIn('A Test Template for Emails', mail.body)
+
+
+@tag('email')
+class AdminInformationNewSignupTests(AuthEnhancedNoSignalsTestCase):
+    """These tests target the 'admin_information_new_signup'-function."""
+    pass

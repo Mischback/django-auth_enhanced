@@ -18,11 +18,11 @@ from django.test import override_settings, tag  # noqa
 from auth_enhanced.forms import SignupForm
 
 # app imports
-from .utils.testcases import AuthEnhancedTestCase
+from .utils.testcases import AuthEnhancedNoSignalsTestCase
 
 
 @tag('forms', 'signup')
-class SignupFormTests(AuthEnhancedTestCase):
+class SignupFormTests(AuthEnhancedNoSignalsTestCase):
     """These tests target the SignupForm.
 
     SignupForm is derived from Django's 'UserCreationForm' and adds some small

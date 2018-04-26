@@ -9,14 +9,15 @@ from unittest import skip  # noqa
 
 # Django imports
 from django.contrib.auth import get_user_model
-from django.db.models.signals import post_save
 from django.test import override_settings, tag  # noqa
 
 # app imports
 from auth_enhanced.models import UserEnhancement
 
 # app imports
-from .utils.testcases import AuthEnhancedTestCase
+from .utils.testcases import (
+    AuthEnhancedNoSignalsTestCase, AuthEnhancedTestCase,
+)
 
 
 @tag('models')
@@ -54,17 +55,7 @@ class UserEnhancementTests(AuthEnhancedTestCase):
 
 
 @tag('models', 'signals')
-class UserEnhancementTestsDisabledSignalHandler(AuthEnhancedTestCase):
-
-    def setUp(self):
-        """Prepare the test environment by disconnecting signal handlers"""
-
-        # isolate the callback-method by disconnecting the signal handler
-        post_save.disconnect(
-            UserEnhancement.callback_create_enhancement_object,
-            sender=get_user_model(),
-            dispatch_uid='DAE_create_enhance_user_object'
-        )
+class UserEnhancementTestsDisabledSignalHandler(AuthEnhancedNoSignalsTestCase):
 
     def test_callback_create_enhancement_object_not_created(self):
         """If this is not a newly created object, do nothing.

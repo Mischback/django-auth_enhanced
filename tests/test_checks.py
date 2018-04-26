@@ -19,11 +19,11 @@ from auth_enhanced.settings import (
 )
 
 # app imports
-from .utils.testcases import AuthEnhancedTestCase
+from .utils.testcases import AuthEnhancedNoSignalsTestCase
 
 
 @tag('checks')
-class CheckSettingsValuesTests(AuthEnhancedTestCase):
+class CheckSettingsValuesTests(AuthEnhancedNoSignalsTestCase):
     """These tests target 'check_settings_values()'."""
 
     @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_AUTO_ACTIVATION)
