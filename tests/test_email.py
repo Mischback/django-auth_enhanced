@@ -9,10 +9,18 @@ from unittest import skip  # noqa
 
 # Django imports
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core import mail
 from django.test import override_settings, tag  # noqa
 
 # app imports
-from auth_enhanced.email import AuthEnhancedEmail
+from auth_enhanced.email import (
+    AuthEnhancedEmail, callback_admin_information_new_signup,
+)
+from auth_enhanced.settings import (
+    DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_MODE_EMAIL_ACTIVATION,
+    DAE_CONST_MODE_MANUAL_ACTIVATION,
+)
 
 # app imports
 from .utils.testcases import AuthEnhancedNoSignalsTestCase
@@ -73,6 +81,122 @@ class AuthEnhancedEmailTests(AuthEnhancedNoSignalsTestCase):
 
 
 @tag('email')
+@override_settings(
+    DAE_ADMIN_SIGNUP_NOTIFICATION=(('django', 'django@localhost', ('mail', )), ),
+    DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX='',
+    DAE_OPERATION_MODE=DAE_CONST_MODE_AUTO_ACTIVATION
+)
 class AdminInformationNewSignupTests(AuthEnhancedNoSignalsTestCase):
-    """These tests target the 'admin_information_new_signup'-function."""
-    pass
+    """These tests target the 'callback_admin_information_new_signup'-function."""
+
+    def test_callback_not_created(self):
+        """If this is not a newly created object, do nothing.
+
+        See 'callback_admin_information_new_signup()'-function."""
+
+        retval = callback_admin_information_new_signup(
+            get_user_model(),
+            None,
+            False,  # this is the relevant 'created' parameter!
+        )
+        self.assertFalse(retval)
+
+    @override_settings(DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX='foo')
+    def test_callback_subject_prefix(self):
+        """Is the subject line modified?
+
+        See 'callback_admin_information_new_signup()'-function."""
+
+        # create a User object to pass along
+        u = get_user_model().objects.create(username='foo')
+
+        retval = callback_admin_information_new_signup(
+            get_user_model(),
+            u,
+            True
+        )
+        self.assertTrue(retval)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, '[{}] New Signup Notification'.format(
+            settings.DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX
+        ))
+
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_AUTO_ACTIVATION)
+    def test_callback_apply_mode_auto(self):
+        """Is 'context['mode_auto']' set?
+
+        See 'callback_admin_information_new_signup()'-function."""
+
+        # create a User object to pass along
+        u = get_user_model().objects.create(username='foo')
+
+        retval = callback_admin_information_new_signup(
+            get_user_model(),
+            u,
+            True
+        )
+        self.assertTrue(retval)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('uses a signup system that activates users automatically', mail.outbox[0].body)
+
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
+    def test_callback_apply_mode_email(self):
+        """Is 'context['mode_email']' set?
+
+        See 'callback_admin_information_new_signup()'-function."""
+
+        # create a User object to pass along
+        u = get_user_model().objects.create(username='foo')
+
+        retval = callback_admin_information_new_signup(
+            get_user_model(),
+            u,
+            True
+        )
+        self.assertTrue(retval)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(
+            'uses a signup system that requires new users to verify their email address before they get activated',
+            mail.outbox[0].body
+        )
+
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_MANUAL_ACTIVATION)
+    def test_callback_apply_mode_manual(self):
+        """Is 'context['mode_manual']' set?
+
+        See 'callback_admin_information_new_signup()'-function."""
+
+        # create a User object to pass along
+        u = get_user_model().objects.create(username='foo')
+
+        retval = callback_admin_information_new_signup(
+            get_user_model(),
+            u,
+            True
+        )
+        self.assertTrue(retval)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('uses a signup system that requires the manual activation of accounts', mail.outbox[0].body)
+
+    @override_settings(DAE_OPERATION_MODE='foo')
+    def test_callback_apply_mode_none(self):
+        """Is 'context['mode_manual']' set?
+
+        See 'callback_admin_information_new_signup()'-function."""
+
+        # create a User object to pass along
+        u = get_user_model().objects.create(username='foo')
+
+        retval = callback_admin_information_new_signup(
+            get_user_model(),
+            u,
+            True
+        )
+        self.assertTrue(retval)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertNotIn('uses a signup system that activates users automatically', mail.outbox[0].body)
+        self.assertNotIn(
+            'uses a signup system that requires new users to verify their email address before they get activated',
+            mail.outbox[0].body
+        )
+        self.assertNotIn('uses a signup system that requires the manual activation of accounts', mail.outbox[0].body)

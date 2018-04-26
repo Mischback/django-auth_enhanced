@@ -104,6 +104,8 @@ def callback_admin_information_new_signup(sender, instance, created, **kwargs):
             mail_context['mode_email'] = True
         elif settings.DAE_OPERATION_MODE == DAE_CONST_MODE_MANUAL_ACTIVATION:
             mail_context['mode_manual'] = True
+        else:
+            pass
 
         # create the email objects
         mails = []
@@ -125,3 +127,8 @@ def callback_admin_information_new_signup(sender, instance, created, **kwargs):
         # get an email connection
         connection = get_connection()
         connection.send_messages(mails)
+
+        return True
+
+    else:
+        return False
