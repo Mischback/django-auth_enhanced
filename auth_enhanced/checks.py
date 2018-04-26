@@ -14,6 +14,8 @@ from django.conf import settings
 from django.core.checks import Error, Warning
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.urls import NoReverseMatch, reverse
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 # app imports
@@ -58,6 +60,59 @@ E003 = Error(
     id='dae.e003'
 )
 
+# DAE_EMAIL_LINK_SCHEME
+E004 = Error(
+    _("'DAE_EMAIL_LINK_SCHEME' is set to an invalid value!"),
+    hint=_(
+        "Please check your settings and ensure, that 'DAE_EMAIL_LINK_SCHEME' "
+        "is set to one of the following values: 'http' or 'https' (default: "
+        "'http')."
+    ),
+    id='dae.e004'
+)
+
+# DAE_EMAIL_ADMIN_LINK_SCHEME
+E005 = Error(
+    _("'DAE_EMAIL_ADMIN_LINK_SCHEME' is set to an invalid value!"),
+    hint=_(
+        "Please check your settings and ensure, that 'DAE_EMAIL_ADMIN_LINK_SCHEME' "
+        "is set to one of the following values: 'http' or 'https' (default: "
+        "'http')."
+    ),
+    id='dae.e005'
+)
+
+# DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX
+E006 = Error(
+    _("'DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX' has to be a string!"),
+    hint=_(
+        "Please check your settings and ensure, that 'DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX' "
+        "is set to a string-value (default: '')."
+    ),
+    id='dae.e006'
+)
+
+# DAE_PROJECT_NAME
+E007 = Error(
+    _("'DAE_PROJECT_NAME' has to be a string!"),
+    hint=_(
+        "Please check your settings and ensure, that 'DAE_PROJECT_NAME' "
+        "is set to a string-value (default: '')."
+    ),
+    id='dae.e007'
+)
+
+# DAE_EMAIL_HOME_VIEW_NAME
+E008 = Error(
+    _("'DAE_EMAIL_HOME_VIEW_NAME' must be set to the name of a view!"),
+    hint=_(
+        "Please check your settings and ensure, that 'DAE_EMAIL_HOME_VIEW_NAME' "
+        "is set to the name of a view of your url configuration. It may "
+        "include namespaces."
+    ),
+    id='dae.e008'
+)
+
 # LOGIN_URL (Django settings)
 W001 = Warning(
     _("'LOGIN_URL' does not point to the login url provided by 'django-auth_enhanced'."),
@@ -79,6 +134,19 @@ W002 = Warning(
         "If everything works just fine, you can safely ignore this warning."
     ),
     id='dae.w002'
+)
+
+# DAE_EMAIL_FROM_ADDRESS
+W003 = Warning(
+    _("'DAE_EMAIL_FROM_ADDRESS' is not set to a valid email address!"),
+    hint=_(
+        "It is highly recommended to set 'DAE_EMAIL_FROM_ADDRESS' to a valid "
+        "email address. Without a valid email address in the 'to'-header, your "
+        "project's mails will probably end up in a spam folder (this does not "
+        "mean, that they will *not* end in a spam folder, if you provide a "
+        "valid address here)."
+    ),
+    id='dae.w009'
 )
 
 
@@ -122,6 +190,28 @@ def check_settings_values(app_configs, **kwargs):
     if e03:
         errors.append(E003)
 
+    # DAE_EMAIL_LINK_SCHEME
+    if settings.DAE_EMAIL_LINK_SCHEME not in ('http', 'https'):
+        errors.append(E004)
+
+    # DAE_EMAIL_ADMIN_LINK_SCHEME
+    if settings.DAE_EMAIL_ADMIN_LINK_SCHEME not in ('http', 'https'):
+        errors.append(E005)
+
+    # DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX
+    if not isinstance(settings.DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX, six.string_types):
+        errors.append(E006)
+
+    # DAE_PROJECT_NAME
+    if not isinstance(settings.DAE_PROJECT_NAME, six.string_types):
+        errors.append(E007)
+
+    # DAE_EMAIL_HOME_VIEW_NAME
+    try:
+        url = reverse(settings.DAE_EMAIL_HOME_VIEW_NAME)    # noqa
+    except NoReverseMatch:
+        errors.append(E008)
+
     # LOGIN_URL (Django settings)
     if settings.LOGIN_URL != DAE_CONST_RECOMMENDED_LOGIN_URL:
         errors.append(W001)
@@ -143,6 +233,11 @@ def check_settings_values(app_configs, **kwargs):
         (settings.EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend')
     ):
         errors.append(W002)
+
+    try:
+        validate_email(settings.DAE_EMAIL_FROM_ADDRESS)
+    except (IndexError, ValidationError):
+        errors.append(W003)
 
     # and now hope, this is still empty! ;)
     return errors

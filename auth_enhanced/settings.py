@@ -163,4 +163,4 @@ def set_app_default_settings():
     # ### DAE_PROJECT_NAME
     # This setting is used in emails as a project-specific branding.
     # Possible values: has to be a 'string'
-    inject_setting('DAE_PROJECT_NAME', 'auth_enhanced - development')
+    inject_setting('DAE_PROJECT_NAME', '')
