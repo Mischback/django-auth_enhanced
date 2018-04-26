@@ -4,6 +4,7 @@
 
 # Django imports
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.template.exceptions import TemplateDoesNotExist
 from django.template.loader import render_to_string
@@ -70,15 +71,27 @@ def admin_information_new_signup(sender, instance, created, **kwargs):
 
         # set the email subject
         mail_subject = 'New Signup Notification'
-        if settings.DAE_ADMIN_NOTIFICATION_PREFIX:
-            mail_subject = '[{}] {}'.format(settings.DAE_ADMIN_NOTIFICATION_PREFIX, mail_subject)
+        if settings.DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX:
+            mail_subject = '[{}] {}'.format(settings.DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX, mail_subject)
 
         # prepare the recipient list
         mail_to = [(x[0], x[1]) for x in settings.DAE_ADMIN_SIGNUP_NOTIFICATION if 'mail' in x[2]]
 
         # TODO: prepare the context
         mail_context = {
-            'new_user': instance.username
+            'admin_link_url': '{}://{}'.format(
+                settings.DAE_EMAIL_ADMIN_LINK_SCHEME,
+                settings.DAE_EMAIL_ADMIN_LNK_AUTHORITY
+            ),
+            'new_user': instance,
+            'project_home': settings.DAE_EMAIL_HOME_VIEW_NAME,
+            'project_link_url': '{}://{}'.format(
+                settings.DAE_EMAIL_LINK_SCHEME,
+                settings.DAE_EMAIL_LINK_AUTHORITY
+            ),
+            'project_name': settings.DAE_PROJECT_NAME,
+            'user_model': get_user_model()._meta,
+            'webmaster_email': settings.DAE_EMAIL_FROM_ADDRESS,
         }
 
         # create the email objects

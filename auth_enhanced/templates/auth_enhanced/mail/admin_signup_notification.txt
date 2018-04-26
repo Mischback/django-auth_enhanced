@@ -1,1 +1,41 @@
-Admin Signup Notification
+{% load admin_urls %}
+*** {{ project_name }} ***
+------------------------------
+
+Hello {{ admin_name }}!
+
+The user '{{ new_user.username }}' just signed up at *{{ project_name }}*!
+An activation mail was sent to verify his email address and he will get activated automatically, if his address is confirmed.
+
+If you want to review the user '{{ new_user.username }}', please visit:
+>> {{ admin_link_url }}{% url user_model|admin_urlname:'change' new_user.pk %}
+
+Please be aware that this mail may be send to other staff members aswell.
+
+
+
+** About this mail
+------------------------------
+
+You received this mail because you are a staff member of *{{ project_name }}* and you will receive notifications about all newly registered accounts.
+*{{ project_name }}* uses a signup system that requires new users to verify their email address before they get activated automatically. Thus, this mail is just for your information. You do not need to do anything about it.
+
+If you do not want to receive further signup notifications, please contact the administrator ({{ webmaster_email }}) and ask him to change the configuration.
+
+
+
+** Notice
+------------------------------
+
+This is an automatically generated email. If you received this mail accidentally, please contact the administrator ({{ webmaster_email }}) and inform him about it.
+
+
+
+** Contact
+------------------------------
+
+- visit the website:
+    >> {{ project_link_url }}{% url project_home %}
+
+- contact the administrator by mail:
+    >> {{ webmaster_email }}
