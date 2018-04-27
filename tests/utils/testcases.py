@@ -15,20 +15,21 @@ from auth_enhanced.models import UserEnhancement
 
 class AuthEnhancedTestCase(TestCase):
     """Base class for all tests of django-auth_enhanced app."""
-    pass
-
-
-class AuthEnhancedNoSignalsTestCase(AuthEnhancedTestCase):
-    """This test class disconnects all of the app's signal handlers."""
 
     @classmethod
-    def setUpClass(cls):
-        """Prepare the test environment by disconnecting signal handlers"""
+    def _disconnect_signal_callbacks(cls):
+        """Disconnects all app-specific signal callbacks.
 
-        # call parent setUpClass
-        super(AuthEnhancedNoSignalsTestCase, cls).setUpClass()
+        This method is closely connected with
+        'auth_enhanced.apps.AuthEnhancedConfig.ready()'. For convenience, all
+        signals should be connected there. All connects have to be reverted
+        here.
 
-        # isolate the callback-method by disconnecting the signal handler
+        Please note, that derived classes may use this classmethod in a
+        'setUp'-method or 'setUpClass'-classmethod, depending on the actual
+        requirement of the test cases."""
+
+        # no need to 'try/except' anything here, 'disconnect()' fails gracefully
         post_save.disconnect(
             UserEnhancement.callback_create_enhancement_object,
             sender=get_user_model(),
@@ -42,8 +43,17 @@ class AuthEnhancedNoSignalsTestCase(AuthEnhancedTestCase):
         )
 
     @classmethod
-    def tearDownClass(cls):
-        """Restore the test environment."""
+    def _reconnect_signal_callbacks(cls):
+        """(Re-) connects all app-specific signal callbacks.
+
+        This method is closely connected with
+        'auth_enhanced.apps.AuthEnhancedConfig.ready()'. For convenience, all
+        signals should be connected there. All connects have to be mimiced
+        here, including logical constraints (i.e. dependency on some setting).
+
+        Please note, that derived classes may use this classmethod in a
+        'tearDown'-method or 'tearDownClass'-classmethod, depending on the
+        actual requirement of the test cases."""
 
         post_save.connect(
             UserEnhancement.callback_create_enhancement_object,
@@ -58,9 +68,47 @@ class AuthEnhancedNoSignalsTestCase(AuthEnhancedTestCase):
                 dispatch_uid='DAE_admin_information_new_signup'
             )
 
+
+class AuthEnhancedNoSignalsTestCase(AuthEnhancedTestCase):
+    """This test class enables running tests without the app-specific
+    signal handlers applied.
+
+    The 'disconnect()' will be performed per test class to enhance performance
+    and signal callbacks are 'reconnected' after all test-methods have been
+    run."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Prepare the test environment."""
+
+        # call parent setUpClass
+        super(AuthEnhancedNoSignalsTestCase, cls).setUpClass()
+
+        # disconnect app-specific signal callbacks
+        cls._disconnect_signal_callbacks()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Restore the test environment."""
+
+        # reconnect app-specific signal callbacks
+        cls._reconnect_signal_callbacks()
+
         # call the parent tearDownClass
         super(AuthEnhancedNoSignalsTestCase, cls).tearDownClass()
 
+
+class AuthEnhancedPerTestDeactivatedSignalsTestCase(AuthEnhancedTestCase):
+    """This test class enables running tests without the app-specific
+    signal handlers applied on a 'per test-method' base.
+
+    This is useful to actually test the connect-process."""
+
+    def setUp(self):
+        self._disconnect_signal_callbacks()
+
+    def tearDown(self):
+        self._reconnect_signal_callbacks()
 
 class AEUrlTestCase(AuthEnhancedNoSignalsTestCase):
     """Test cases for URL configuration

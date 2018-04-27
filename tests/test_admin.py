@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Includes tests targeting the app-specific forms.
+"""Includes tests targeting the app-specific admin classes.
 
     - target file: auth_enhanced/admin.py
     - included tags: 'admin'"""
