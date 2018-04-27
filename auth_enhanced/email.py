@@ -132,3 +132,7 @@ def callback_admin_information_new_signup(sender, instance, created, **kwargs):
 
     else:
         return False
+
+
+def callback_user_signup_email_verification(sender, instance, created, **kwargs):
+    print('[!] send email to user IOT verify his email address...')

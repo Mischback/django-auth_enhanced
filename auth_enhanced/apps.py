@@ -9,8 +9,13 @@ from django.db.models.signals import post_save
 
 # app imports
 from auth_enhanced.checks import check_settings_values
-from auth_enhanced.email import callback_admin_information_new_signup
-from auth_enhanced.settings import set_app_default_settings
+from auth_enhanced.email import (
+    callback_admin_information_new_signup,
+    callback_user_signup_email_verification,
+)
+from auth_enhanced.settings import (
+    DAE_CONST_MODE_EMAIL_ACTIVATION, set_app_default_settings,
+)
 
 
 class AuthEnhancedConfig(AppConfig):
@@ -50,4 +55,16 @@ class AuthEnhancedConfig(AppConfig):
                 callback_admin_information_new_signup,
                 sender=settings.AUTH_USER_MODEL,
                 dispatch_uid='DAE_admin_information_new_signup'
+            )
+
+        # add a 'post_save'-callback to send an email to the newly registered
+        #   user, if 'DAE_OPERATION_MODE' == 'DAE_CONST_MODE_EMAIL_ACTIVATION'.
+        #   This means, an automatic email verification is only available in
+        #   that mode. However, users may verify their email addresses by a
+        #   manual process.
+        if settings.DAE_OPERATION_MODE == DAE_CONST_MODE_EMAIL_ACTIVATION:
+            post_save.connect(
+                callback_user_signup_email_verification,
+                sender=settings.AUTH_USER_MODEL,
+                dispatch_uid='DAE_user_signup_email_verification'
             )

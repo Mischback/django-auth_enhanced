@@ -9,8 +9,12 @@ from django.test import TestCase
 from django.urls import resolve
 
 # app imports
-from auth_enhanced.email import callback_admin_information_new_signup
+from auth_enhanced.email import (
+    callback_admin_information_new_signup,
+    callback_user_signup_email_verification,
+)
 from auth_enhanced.models import UserEnhancement
+from auth_enhanced.settings import DAE_CONST_MODE_EMAIL_ACTIVATION
 
 
 class AuthEnhancedTestCaseBase(TestCase):
@@ -42,6 +46,12 @@ class AuthEnhancedTestCaseBase(TestCase):
             dispatch_uid='DAE_admin_information_new_signup'
         )
 
+        post_save.disconnect(
+            callback_user_signup_email_verification,
+            sender=get_user_model(),
+            dispatch_uid='DAE_user_signup_email_verification'
+        )
+
     @classmethod
     def _reconnect_signal_callbacks(cls):
         """(Re-) connects all app-specific signal callbacks.
@@ -66,6 +76,13 @@ class AuthEnhancedTestCaseBase(TestCase):
                 callback_admin_information_new_signup,
                 sender=get_user_model(),
                 dispatch_uid='DAE_admin_information_new_signup'
+            )
+
+        if settings.DAE_OPERATION_MODE == DAE_CONST_MODE_EMAIL_ACTIVATION:
+            post_save.connect(
+                callback_user_signup_email_verification,
+                sender=settings.AUTH_USER_MODEL,
+                dispatch_uid='DAE_user_signup_email_verification'
             )
 
 

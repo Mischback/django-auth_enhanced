@@ -15,9 +15,7 @@ from django.test import override_settings, tag  # noqa
 from auth_enhanced.models import UserEnhancement
 
 # app imports
-from .utils.testcases import (
-    AuthEnhancedTestCase, AuthEnhancedTestCaseBase,
-)
+from .utils.testcases import AuthEnhancedTestCase, AuthEnhancedTestCaseBase
 
 
 @tag('models')
