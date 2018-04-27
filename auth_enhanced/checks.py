@@ -114,18 +114,18 @@ E008 = Error(
 )
 
 # LOGIN_URL (Django settings)
-W001 = Warning(
+W009 = Warning(
     _("'LOGIN_URL' does not point to the login url provided by 'django-auth_enhanced'."),
     hint=_(
         "The suggested value for 'LOGIN_URL' is '{}', which "
         "provides the built-in login view. If you set another login url on "
         "purpose, you can safely ignore this warning.".format(DAE_CONST_RECOMMENDED_LOGIN_URL)
     ),
-    id='dae.w001'
+    id='dae.w009'
 )
 
 # mail settings
-W002 = Warning(
+W010 = Warning(
     _("Your email settings are identical to Django's default values!"),
     hint=_(
         "While it may absolutely be possible to run your Django project with "
@@ -133,11 +133,11 @@ W002 = Warning(
         "while running 'django-auth_enhanced', please check your settings. "
         "If everything works just fine, you can safely ignore this warning."
     ),
-    id='dae.w002'
+    id='dae.w010'
 )
 
 # DAE_EMAIL_FROM_ADDRESS
-W003 = Warning(
+W011 = Warning(
     _("'DAE_EMAIL_FROM_ADDRESS' is not set to a valid email address!"),
     hint=_(
         "It is highly recommended to set 'DAE_EMAIL_FROM_ADDRESS' to a valid "
@@ -146,7 +146,7 @@ W003 = Warning(
         "mean, that they will *not* end in a spam folder, if you provide a "
         "valid address here)."
     ),
-    id='dae.w009'
+    id='dae.w011'
 )
 
 
@@ -214,7 +214,7 @@ def check_settings_values(app_configs, **kwargs):
 
     # LOGIN_URL (Django settings)
     if settings.LOGIN_URL != DAE_CONST_RECOMMENDED_LOGIN_URL:
-        errors.append(W001)
+        errors.append(W009)
 
     # mail settings
     #   This check is somehow fuzzy. Basically it checks, if all email-related
@@ -232,12 +232,12 @@ def check_settings_values(app_configs, **kwargs):
         (settings.EMAIL_SSL_CERTFILE is None) and
         (settings.EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend')
     ):
-        errors.append(W002)
+        errors.append(W010)
 
     try:
         validate_email(settings.DAE_EMAIL_FROM_ADDRESS)
     except (IndexError, ValidationError):
-        errors.append(W003)
+        errors.append(W011)
 
     # and now hope, this is still empty! ;)
     return errors

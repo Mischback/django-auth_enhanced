@@ -14,7 +14,7 @@ from django.test import override_settings, tag  # noqa
 
 # app imports
 from auth_enhanced.checks import (
-    E001, E002, E003, E004, E005, E006, E007, E008, W001, W002, W003,
+    E001, E002, E003, E004, E005, E006, E007, E008, W009, W010, W011,
     check_settings_values,
 )
 from auth_enhanced.settings import (
@@ -144,16 +144,16 @@ class CheckSettingsValuesTests(AuthEnhancedNoSignalsTestCase):
         self.assertEqual(errors, [E008])
 
     @override_settings(LOGIN_URL=DAE_CONST_RECOMMENDED_LOGIN_URL)
-    def test_w001_valid(self):
+    def test_w009_valid(self):
         """Check should accept valid values."""
         errors = check_settings_values(None)
         self.assertEqual(errors, [])
 
     @override_settings(LOGIN_URL='foo/')
-    def test_w001_invalid(self):
+    def test_w009_invalid(self):
         """Invalid values show an error message."""
         errors = check_settings_values(None)
-        self.assertEqual(errors, [W001])
+        self.assertEqual(errors, [W009])
 
     @override_settings(
         EMAIL_HOST='localhost',
@@ -167,19 +167,19 @@ class CheckSettingsValuesTests(AuthEnhancedNoSignalsTestCase):
         EMAIL_SSL_CERTFILE=None,
         EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
     )
-    def test_w002_invalid(self):
+    def test_w010_invalid(self):
         """Invalid values show an error message."""
         errors = check_settings_values(None)
-        self.assertEqual(errors, [W002])
+        self.assertEqual(errors, [W010])
 
     @override_settings(DAE_EMAIL_FROM_ADDRESS='foo@localhost')
-    def test_w003_valid(self):
+    def test_w011_valid(self):
         """Check should accept valid values."""
         errors = check_settings_values(None)
         self.assertEqual(errors, [])
 
     @override_settings(DAE_EMAIL_FROM_ADDRESS='foo')
-    def test_w003_invalid(self):
+    def test_w011_invalid(self):
         """Invalid values show an error message."""
         errors = check_settings_values(None)
-        self.assertEqual(errors, [W003])
+        self.assertEqual(errors, [W011])
