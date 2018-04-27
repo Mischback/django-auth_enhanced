@@ -14,7 +14,6 @@ from django.conf import settings
 from django.core.checks import Error, Warning
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.urls import NoReverseMatch, reverse
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
@@ -60,72 +59,29 @@ E003 = Error(
     id='dae.e003'
 )
 
-# DAE_EMAIL_LINK_SCHEME
-E004 = Error(
-    _("'DAE_EMAIL_LINK_SCHEME' is set to an invalid value!"),
-    hint=_(
-        "Please check your settings and ensure, that 'DAE_EMAIL_LINK_SCHEME' "
-        "is set to one of the following values: 'http' or 'https' (default: "
-        "'http')."
-    ),
-    id='dae.e004'
-)
-
-# DAE_EMAIL_ADMIN_LINK_SCHEME
-E005 = Error(
-    _("'DAE_EMAIL_ADMIN_LINK_SCHEME' is set to an invalid value!"),
-    hint=_(
-        "Please check your settings and ensure, that 'DAE_EMAIL_ADMIN_LINK_SCHEME' "
-        "is set to one of the following values: 'http' or 'https' (default: "
-        "'http')."
-    ),
-    id='dae.e005'
-)
-
 # DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX
-E006 = Error(
+E004 = Error(
     _("'DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX' has to be a string!"),
     hint=_(
         "Please check your settings and ensure, that 'DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX' "
         "is set to a string-value (default: '')."
     ),
-    id='dae.e006'
-)
-
-# DAE_PROJECT_NAME
-E007 = Error(
-    _("'DAE_PROJECT_NAME' has to be a string!"),
-    hint=_(
-        "Please check your settings and ensure, that 'DAE_PROJECT_NAME' "
-        "is set to a string-value (default: '')."
-    ),
-    id='dae.e007'
-)
-
-# DAE_EMAIL_HOME_VIEW_NAME
-E008 = Error(
-    _("'DAE_EMAIL_HOME_VIEW_NAME' must be set to the name of a view!"),
-    hint=_(
-        "Please check your settings and ensure, that 'DAE_EMAIL_HOME_VIEW_NAME' "
-        "is set to the name of a view of your url configuration. It may "
-        "include namespaces."
-    ),
-    id='dae.e008'
+    id='dae.e004'
 )
 
 # LOGIN_URL (Django settings)
-W009 = Warning(
+W005 = Warning(
     _("'LOGIN_URL' does not point to the login url provided by 'django-auth_enhanced'."),
     hint=_(
         "The suggested value for 'LOGIN_URL' is '{}', which "
         "provides the built-in login view. If you set another login url on "
         "purpose, you can safely ignore this warning.".format(DAE_CONST_RECOMMENDED_LOGIN_URL)
     ),
-    id='dae.w009'
+    id='dae.w005'
 )
 
 # mail settings
-W010 = Warning(
+W006 = Warning(
     _("Your email settings are identical to Django's default values!"),
     hint=_(
         "While it may absolutely be possible to run your Django project with "
@@ -133,11 +89,11 @@ W010 = Warning(
         "while running 'django-auth_enhanced', please check your settings. "
         "If everything works just fine, you can safely ignore this warning."
     ),
-    id='dae.w010'
+    id='dae.w006'
 )
 
 # DAE_EMAIL_FROM_ADDRESS
-W011 = Warning(
+W007 = Warning(
     _("'DAE_EMAIL_FROM_ADDRESS' is not set to a valid email address!"),
     hint=_(
         "It is highly recommended to set 'DAE_EMAIL_FROM_ADDRESS' to a valid "
@@ -146,7 +102,7 @@ W011 = Warning(
         "mean, that they will *not* end in a spam folder, if you provide a "
         "valid address here)."
     ),
-    id='dae.w011'
+    id='dae.w007'
 )
 
 
@@ -190,31 +146,13 @@ def check_settings_values(app_configs, **kwargs):
     if e03:
         errors.append(E003)
 
-    # DAE_EMAIL_LINK_SCHEME
-    if settings.DAE_EMAIL_LINK_SCHEME not in ('http', 'https'):
-        errors.append(E004)
-
-    # DAE_EMAIL_ADMIN_LINK_SCHEME
-    if settings.DAE_EMAIL_ADMIN_LINK_SCHEME not in ('http', 'https'):
-        errors.append(E005)
-
     # DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX
     if not isinstance(settings.DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX, six.string_types):
-        errors.append(E006)
-
-    # DAE_PROJECT_NAME
-    if not isinstance(settings.DAE_PROJECT_NAME, six.string_types):
-        errors.append(E007)
-
-    # DAE_EMAIL_HOME_VIEW_NAME
-    try:
-        url = reverse(settings.DAE_EMAIL_HOME_VIEW_NAME)    # noqa
-    except NoReverseMatch:
-        errors.append(E008)
+        errors.append(E004)
 
     # LOGIN_URL (Django settings)
     if settings.LOGIN_URL != DAE_CONST_RECOMMENDED_LOGIN_URL:
-        errors.append(W009)
+        errors.append(W005)
 
     # mail settings
     #   This check is somehow fuzzy. Basically it checks, if all email-related
@@ -232,12 +170,12 @@ def check_settings_values(app_configs, **kwargs):
         (settings.EMAIL_SSL_CERTFILE is None) and
         (settings.EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend')
     ):
-        errors.append(W010)
+        errors.append(W006)
 
     try:
         validate_email(settings.DAE_EMAIL_FROM_ADDRESS)
     except (IndexError, ValidationError):
-        errors.append(W011)
+        errors.append(W007)
 
     # and now hope, this is still empty! ;)
     return errors

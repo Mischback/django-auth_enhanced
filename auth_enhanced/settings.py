@@ -84,50 +84,10 @@ def set_app_default_settings():
     #               notification methods. As of now, only 'mail' is supported
     inject_setting('DAE_ADMIN_SIGNUP_NOTIFICATION', False)
 
-    # ### DAE_EMAIL_LINK_SCHEME
-    # If mails sent by django-auth_enhanced contain links to the project
-    #   website, use this 'scheme'.
-    # 'scheme' is to be understood as specified in RFC3986
-    #   https://tools.ietf.org/html/rfc3986#section-3
-    # Possible values:
-    #   - 'http'
-    #   - 'https'
-    # (injected outside alphabetical order because it gets referenced later!)
-    inject_setting('DAE_EMAIL_LINK_SCHEME', 'http')
-
-    # ### DAE_EMAIL_LINK_AUTHORITY
-    # If mails send by django-auth_enhanced contain links to the project
-    #   website, use this 'authority'.
-    # 'authority' is to be understood as specified in RFC3986
-    #   https://tools.ietf.org/html/rfc3986#section-3
-    # (injected outside alphabetical order because it gets referenced later!)
-    inject_setting('DAE_EMAIL_LINK_AUTHORITY', '127.0.0.1:8000')
-
     # ### DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX
     # Mails sent by django-auth_enhanced will contain a subject with this
     #   customizable prefix.
     inject_setting('DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX', '')
-
-    # ### DAE_EMAIL_ADMIN_LINK_SCHEME
-    # If mails sent by django-auth_enhanced addressed to superusers contain
-    #   links to the project website, use this 'scheme'.
-    # 'scheme' is to be understood as specified in RFC3986
-    #   https://tools.ietf.org/html/rfc3986#section-3
-    # Possible values:
-    #   - 'http'
-    #   - 'https'
-    # Relies on DAE_EMAIL_LINK_SCHEME. If your admin site is served from the
-    #   same Django instance, you shouldn't need to touch this setting.
-    inject_setting('DAE_EMAIL_ADMIN_LINK_SCHEME', settings.DAE_EMAIL_LINK_SCHEME)
-
-    # ### DAE_EMAIL_ADMIN_LNK_AUTHORITY
-    # If mails send by django-auth_enhanced addressed to superusers contain
-    #   links to the project website, use this 'authority'.
-    # 'authority' is to be understood as specified in RFC3986
-    #   https://tools.ietf.org/html/rfc3986#section-3
-    # Relies on DAE_EMAIL_LINK_AUTHORITY. If your admin site is served from the
-    #   same Django instance, you shouldn't need to touch this setting.
-    inject_setting('DAE_EMAIL_ADMIN_LNK_AUTHORITY', settings.DAE_EMAIL_LINK_AUTHORITY)
 
     # ### DAE_EMAIL_FROM_ADDRESS
     # Mails sent by django-auth_enhanced will have the following 'from'-address.
@@ -135,10 +95,6 @@ def set_app_default_settings():
     #   defaults to 'webmaster@localhost' itsself.
     #   You may choose to change the built-in Django-setting or this app's one.
     inject_setting('DAE_EMAIL_FROM_ADDRESS', settings.DEFAULT_FROM_EMAIL)
-
-    # ### DAE_EMAIL_HOME_VIEW_NAME
-    # The name of the home view (like in: the starting page of your project)
-    inject_setting('DAE_EMAIL_HOME_VIEW_NAME', 'home')
 
     # ### DAE_EMAIL_TEMPLATE_PREFIX
     # This setting determines the place to look for mail templates.
@@ -159,8 +115,3 @@ def set_app_default_settings():
     #       - this mode will *NOT* activate newly registered accounts and
     #           relies on manual activation by a superuser
     inject_setting('DAE_OPERATION_MODE', DAE_CONST_MODE_AUTO_ACTIVATION)
-
-    # ### DAE_PROJECT_NAME
-    # This setting is used in emails as a project-specific branding.
-    # Possible values: has to be a 'string'
-    inject_setting('DAE_PROJECT_NAME', '')

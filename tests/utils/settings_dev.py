@@ -86,9 +86,6 @@ LOGIN_REDIRECT_URL = '/'
 # just for development. Doesn't work for tests (locmem?)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# provide a project name, used in email templates
-DAE_PROJECT_NAME = 'auth_enhanced - development'
-
 # ### CURRENT DEVELOPMENT
 # DAE_ADMIN_SIGNUP_NOTIFICATION = (
 #     ('django', 'django@localhost', ('mail', )),

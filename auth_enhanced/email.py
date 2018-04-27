@@ -83,18 +83,8 @@ def callback_admin_information_new_signup(sender, instance, created, **kwargs):
 
         # TODO: prepare the context
         mail_context = {
-            'admin_link_url': '{}://{}'.format(
-                settings.DAE_EMAIL_ADMIN_LINK_SCHEME,
-                settings.DAE_EMAIL_ADMIN_LNK_AUTHORITY
-            ),
             'new_user': instance,
-            'project_home': settings.DAE_EMAIL_HOME_VIEW_NAME,
-            'project_link_url': '{}://{}'.format(
-                settings.DAE_EMAIL_LINK_SCHEME,
-                settings.DAE_EMAIL_LINK_AUTHORITY
-            ),
-            'project_name': settings.DAE_PROJECT_NAME,
-            'user_model': get_user_model()._meta,
+            'user_model': get_user_model()._meta,   # used to construct admin-menu links
             'webmaster_email': settings.DAE_EMAIL_FROM_ADDRESS,
         }
 
@@ -135,4 +125,20 @@ def callback_admin_information_new_signup(sender, instance, created, **kwargs):
 
 
 def callback_user_signup_email_verification(sender, instance, created, **kwargs):
-    print('[!] send email to user IOT verify his email address...')
+    """Sends the verification mail to the newly created user.
+
+    This function acts like a callback to a 'post_save'-signal."""
+
+    # the verification mail must only be sent (automatically) on object creation
+    if created:
+        mail = AuthEnhancedEmail(
+            template_name='',
+            context={
+                'new_user': instance,
+            },
+            subject='',
+            from_email=settings.DAE_EMAIL_FROM_ADDRESS,
+            to=(instance.email, )   # TODO: don't rely on email! Use EMAIL_FIELD
+        )
+    else:
+        return False

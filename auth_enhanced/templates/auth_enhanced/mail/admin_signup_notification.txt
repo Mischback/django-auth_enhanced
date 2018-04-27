@@ -38,7 +38,7 @@ This is an automatically generated email. If you received this mail accidentally
 ------------------------------
 
 - visit the website:
-    >> {{ project_link_url }}{% url project_home %}
+    >> {{ project_link_url }}
 
 - contact the administrator by mail:
     >> {{ webmaster_email }}
