@@ -13,7 +13,10 @@ from unittest import skip  # noqa
 from django.test import override_settings, tag  # noqa
 
 # app imports
-from auth_enhanced.checks import E001, E002, W001, W002, check_settings_values
+from auth_enhanced.checks import (
+    E001, E002, E003, E004, E005, E006, E007, E008, W001, W002, W003,
+    check_settings_values,
+)
 from auth_enhanced.settings import (
     DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_RECOMMENDED_LOGIN_URL,
 )
@@ -50,6 +53,96 @@ class CheckSettingsValuesTests(AuthEnhancedNoSignalsTestCase):
         errors = check_settings_values(None)
         self.assertEqual(errors, [E002])
 
+    @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=False)
+    def test_e003_valid_false(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=(('foo', 'foo@localhost', ('mail', )), ))
+    def test_e003_valid_list(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=True)
+    def test_e003_invalid_bool_true(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E003])
+
+    @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=(('foo', 'foo', ('mail', )), ))
+    def test_e003_invalid_no_valid_mail_address(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E003])
+
+    @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=(('foo', 'foo@localhost', ('liam', )), ))
+    def test_e003_invalid_no_valid_notification_method(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E003])
+
+    @override_settings(DAE_EMAIL_LINK_SCHEME='http')
+    def test_e004_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_EMAIL_LINK_SCHEME='ftp')
+    def test_e004_invalid(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E004])
+
+    @override_settings(DAE_EMAIL_ADMIN_LINK_SCHEME='http')
+    def test_e005_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_EMAIL_ADMIN_LINK_SCHEME='ftp')
+    def test_e005_invalid(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E005])
+
+    @override_settings(DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX='foo')
+    def test_e006_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX=None)
+    def test_e006_invalid(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E006])
+
+    @override_settings(DAE_PROJECT_NAME='foo')
+    def test_e007_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_PROJECT_NAME=None)
+    def test_e007_invalid(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E007])
+
+    @override_settings(DAE_EMAIL_HOME_VIEW_NAME='home')
+    def test_e008_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_EMAIL_HOME_VIEW_NAME='really-not-existing-view-name')
+    def test_e008_invalid(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E008])
+
     @override_settings(LOGIN_URL=DAE_CONST_RECOMMENDED_LOGIN_URL)
     def test_w001_valid(self):
         """Check should accept valid values."""
@@ -78,3 +171,15 @@ class CheckSettingsValuesTests(AuthEnhancedNoSignalsTestCase):
         """Invalid values show an error message."""
         errors = check_settings_values(None)
         self.assertEqual(errors, [W002])
+
+    @override_settings(DAE_EMAIL_FROM_ADDRESS='foo@localhost')
+    def test_w003_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_EMAIL_FROM_ADDRESS='foo')
+    def test_w003_invalid(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [W003])
