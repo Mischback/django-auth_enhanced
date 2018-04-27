@@ -11,9 +11,9 @@ from unittest import skip  # noqa
 from django.test import override_settings, tag  # noqa
 
 # app imports
-from .utils.testcases import AuthEnhancedNoSignalsTestCase
+from .utils.testcases import AuthEnhancedTestCase
 
 
 @tag('admin')
-class UserEnhancementAdminTests(AuthEnhancedNoSignalsTestCase):
+class UserEnhancementAdminTests(AuthEnhancedTestCase):
     pass

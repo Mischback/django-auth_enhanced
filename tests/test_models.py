@@ -16,12 +16,12 @@ from auth_enhanced.models import UserEnhancement
 
 # app imports
 from .utils.testcases import (
-    AuthEnhancedNoSignalsTestCase, AuthEnhancedTestCase,
+    AuthEnhancedTestCase, AuthEnhancedTestCaseBase,
 )
 
 
 @tag('models')
-class UserEnhancementTests(AuthEnhancedTestCase):
+class UserEnhancementTests(AuthEnhancedTestCaseBase):
     """Tests targeting the model class."""
 
     def test_email_is_verified(self):
@@ -55,7 +55,7 @@ class UserEnhancementTests(AuthEnhancedTestCase):
 
 
 @tag('models', 'signals')
-class UserEnhancementTestsDisabledSignalHandler(AuthEnhancedNoSignalsTestCase):
+class UserEnhancementTestsDisabledSignalHandler(AuthEnhancedTestCase):
 
     def test_callback_create_enhancement_object_not_created(self):
         """If this is not a newly created object, do nothing.

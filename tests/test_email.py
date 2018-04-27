@@ -23,11 +23,11 @@ from auth_enhanced.settings import (
 )
 
 # app imports
-from .utils.testcases import AuthEnhancedNoSignalsTestCase
+from .utils.testcases import AuthEnhancedTestCase
 
 
 @tag('email')
-class AuthEnhancedEmailTests(AuthEnhancedNoSignalsTestCase):
+class AuthEnhancedEmailTests(AuthEnhancedTestCase):
     """These tests target the base class for app-specific email objects."""
 
     def test_init_template_name_required(self):
@@ -86,7 +86,7 @@ class AuthEnhancedEmailTests(AuthEnhancedNoSignalsTestCase):
     DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX='',
     DAE_OPERATION_MODE=DAE_CONST_MODE_AUTO_ACTIVATION
 )
-class AdminInformationNewSignupTests(AuthEnhancedNoSignalsTestCase):
+class AdminInformationNewSignupTests(AuthEnhancedTestCase):
     """These tests target the 'callback_admin_information_new_signup'-function."""
 
     def test_callback_not_created(self):

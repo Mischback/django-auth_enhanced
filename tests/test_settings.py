@@ -19,11 +19,11 @@ from django.test import override_settings, tag  # noqa
 from auth_enhanced.settings import inject_setting
 
 # app imports
-from .utils.testcases import AuthEnhancedNoSignalsTestCase
+from .utils.testcases import AuthEnhancedTestCase
 
 
 @tag('settings')
-class InjectSettingTests(AuthEnhancedNoSignalsTestCase):
+class InjectSettingTests(AuthEnhancedTestCase):
     """These tests target 'inject_setting()'."""
 
     def test_name_not_uppercase(self):

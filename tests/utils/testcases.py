@@ -13,7 +13,7 @@ from auth_enhanced.email import callback_admin_information_new_signup
 from auth_enhanced.models import UserEnhancement
 
 
-class AuthEnhancedTestCase(TestCase):
+class AuthEnhancedTestCaseBase(TestCase):
     """Base class for all tests of django-auth_enhanced app."""
 
     @classmethod
@@ -69,7 +69,7 @@ class AuthEnhancedTestCase(TestCase):
             )
 
 
-class AuthEnhancedNoSignalsTestCase(AuthEnhancedTestCase):
+class AuthEnhancedTestCase(AuthEnhancedTestCaseBase):
     """This test class enables running tests without the app-specific
     signal handlers applied.
 
@@ -82,7 +82,7 @@ class AuthEnhancedNoSignalsTestCase(AuthEnhancedTestCase):
         """Prepare the test environment."""
 
         # call parent setUpClass
-        super(AuthEnhancedNoSignalsTestCase, cls).setUpClass()
+        super(AuthEnhancedTestCase, cls).setUpClass()
 
         # disconnect app-specific signal callbacks
         cls._disconnect_signal_callbacks()
@@ -95,10 +95,10 @@ class AuthEnhancedNoSignalsTestCase(AuthEnhancedTestCase):
         cls._reconnect_signal_callbacks()
 
         # call the parent tearDownClass
-        super(AuthEnhancedNoSignalsTestCase, cls).tearDownClass()
+        super(AuthEnhancedTestCase, cls).tearDownClass()
 
 
-class AuthEnhancedPerTestDeactivatedSignalsTestCase(AuthEnhancedTestCase):
+class AuthEnhancedPerTestDeactivatedSignalsTestCase(AuthEnhancedTestCaseBase):
     """This test class enables running tests without the app-specific
     signal handlers applied on a 'per test-method' base.
 
@@ -110,7 +110,8 @@ class AuthEnhancedPerTestDeactivatedSignalsTestCase(AuthEnhancedTestCase):
     def tearDown(self):
         self._reconnect_signal_callbacks()
 
-class AEUrlTestCase(AuthEnhancedNoSignalsTestCase):
+
+class AEUrlTestCase(AuthEnhancedTestCase):
     """Test cases for URL configuration
 
     Provides an additional assert()-method, 'assertCBVName' to check, if an url
