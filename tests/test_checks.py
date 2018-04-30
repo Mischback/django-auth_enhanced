@@ -14,7 +14,8 @@ from django.test import override_settings, tag  # noqa
 
 # app imports
 from auth_enhanced.checks import (
-    E001, E002, E003, E004, E008, W005, W006, W007, check_settings_values,
+    E001, E002, E003, E004, E008, E009, W005, W006, W007,
+    check_settings_values,
 )
 from auth_enhanced.settings import (
     DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_RECOMMENDED_LOGIN_URL,
@@ -146,3 +147,15 @@ class CheckSettingsValuesTests(AuthEnhancedTestCase):
         """Invalid values show an error message."""
         errors = check_settings_values(None)
         self.assertEqual(errors, [E008])
+
+    @override_settings(DAE_SALT='foo')
+    def test_e009_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_SALT=None)
+    def test_e009_invalid(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E009])

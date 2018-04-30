@@ -121,3 +121,8 @@ def set_app_default_settings():
     #       - this mode will *NOT* activate newly registered accounts and
     #           relies on manual activation by a superuser
     inject_setting('DAE_OPERATION_MODE', DAE_CONST_MODE_AUTO_ACTIVATION)
+
+    # ### DAE_SALT
+    # This salt is used to keep signing processes thoughout your project
+    #   nicely seperated. See https://docs.djangoproject.com/en/dev/topics/signing/#using-the-salt-argument
+    inject_setting('DAE_SALT', 'django-auth_enhanced')

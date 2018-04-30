@@ -115,6 +115,16 @@ E008 = Error(
     id='dae.e008'
 )
 
+# DAE_SALT
+E009 = Error(
+    _("'DAE_SALT' has to be a string!"),
+    hint=_(
+        "Please check your settings and ensure, that 'DAE_SALT' is set to a "
+        "string-value (default: 'django-auth_enhanced')."
+    ),
+    id='dae.e009'
+)
+
 
 def check_settings_values(app_configs, **kwargs):
     """Checks, if the app-specific settings have valid values."""
@@ -182,6 +192,7 @@ def check_settings_values(app_configs, **kwargs):
     ):
         errors.append(W006)
 
+    # DAE_EMAIL_FROM_ADDRESS
     try:
         validate_email(settings.DAE_EMAIL_FROM_ADDRESS)
     except (IndexError, ValidationError):
@@ -190,6 +201,10 @@ def check_settings_values(app_configs, **kwargs):
     # DAE_EMAIL_PREFIX
     if not isinstance(settings.DAE_EMAIL_PREFIX, six.string_types):
         errors.append(E008)
+
+    # DAE_SALT
+    if not isinstance(settings.DAE_SALT, six.string_types):
+        errors.append(E009)
 
     # and now hope, this is still empty! ;)
     return errors
