@@ -1,0 +1,25 @@
+{% load admin_urls %}
+*** django-auth_enhanced ***
+------------------------------
+
+Hello {{ new_user.username }}!
+
+You just completed the the signup process at *django-auth_enhanced*. To activate your account and enable login, you have to verify your email address.
+
+
+
+** Notice
+------------------------------
+
+This is an automatically generated email. If you received this mail accidentally, please contact the administrator ({{ webmaster_email }}) and inform him about it. Or just ignore this mail and delete it!
+
+
+
+** Contact
+------------------------------
+
+- visit the website:
+    >> http://deb9:8080
+
+- contact the administrator by mail:
+    >> {{ webmaster_email }}

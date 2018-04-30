@@ -152,10 +152,11 @@ def callback_user_signup_email_verification(sender, instance, created, **kwargs)
         mail = AuthEnhancedEmail(
             context={
                 'new_user': instance,
+                'webmaster_email': settings.DAE_EMAIL_FROM_ADDRESS,  # TODO: see notice above
             },
             from_email=settings.DAE_EMAIL_FROM_ADDRESS,
             subject=mail_subject,
-            template_name='',
+            template_name='user_email_verification',
             to=(instance.email, )   # TODO: don't rely on email! Use EMAIL_FIELD
         )
 
