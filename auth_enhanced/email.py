@@ -74,7 +74,7 @@ def callback_admin_information_new_signup(sender, instance, created, **kwargs):
     if created:
 
         # set the email subject
-        mail_subject = 'New Signup Notification'
+        mail_subject = _('New Signup Notification')
         if settings.DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX:
             mail_subject = '[{}] {}'.format(settings.DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX, mail_subject)
 
@@ -83,11 +83,23 @@ def callback_admin_information_new_signup(sender, instance, created, **kwargs):
 
         # TODO: prepare the context
         mail_context = {
+            # TODO: sufficient? 'new_user.username' in templates rely on 'username'
+            #   being get_username()... KEEP IT AS ABSTRACT AS POSSIBLE
+            #   Instead of adding another context-variable, use a templatetag!
             'new_user': instance,
-            'user_model': get_user_model()._meta,   # used to construct admin-menu links
+            # used to construct admin-menu links (just keep this, it adds to abstraction)
+            'user_model': get_user_model()._meta,
+            # basically this is given here, because the mail's headers should match
+            #   the content.
+            # TODO: have another look at email best practices. How is the 'from'
+            #   address related to 'reply_to'? Is the format of these addresses
+            #   important (<name> name@domain.tld vs. name@domain.tld)?
             'webmaster_email': settings.DAE_EMAIL_FROM_ADDRESS,
         }
 
+        # addes the current operation mode to the context
+        # TODO: This is not the best solution, but even better than to compare
+        #   to some string in the template
         if settings.DAE_OPERATION_MODE == DAE_CONST_MODE_AUTO_ACTIVATION:
             mail_context['mode_auto'] = True
         elif settings.DAE_OPERATION_MODE == DAE_CONST_MODE_EMAIL_ACTIVATION:
@@ -106,10 +118,10 @@ def callback_admin_information_new_signup(sender, instance, created, **kwargs):
 
             mails.append(
                 AuthEnhancedEmail(
-                    template_name='admin_signup_notification',
                     context=loop_mail_context,
-                    subject=mail_subject,
                     from_email=settings.DAE_EMAIL_FROM_ADDRESS,
+                    subject=mail_subject,
+                    template_name='admin_signup_notification',
                     to=(m[1], )
                 )
             )
@@ -131,14 +143,26 @@ def callback_user_signup_email_verification(sender, instance, created, **kwargs)
 
     # the verification mail must only be sent (automatically) on object creation
     if created:
+
+        # set the email subject
+        mail_subject = _('Email Verification Mail')
+        if settings.DAE_EMAIL_PREFIX:
+            mail_subject = '[{}] {}'.format(settings.DAE_EMAIL_PREFIX, mail_subject)
+
         mail = AuthEnhancedEmail(
-            template_name='',
             context={
                 'new_user': instance,
             },
-            subject='',
             from_email=settings.DAE_EMAIL_FROM_ADDRESS,
+            subject=mail_subject,
+            template_name='',
             to=(instance.email, )   # TODO: don't rely on email! Use EMAIL_FIELD
         )
+
+        # actually send the mail
+        mail.send()
+
+        return True
+
     else:
         return False

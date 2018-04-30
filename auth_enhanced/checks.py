@@ -105,6 +105,16 @@ W007 = Warning(
     id='dae.w007'
 )
 
+# DAE_EMAIL_PREFIX
+E008 = Error(
+    _("'DAE_EMAIL_PREFIX' has to be a string!"),
+    hint=_(
+        "Please check your settings and ensure, that 'DAE_EMAIL_PREFIX' is set "
+        "to a string-value (default: '')."
+    ),
+    id='dae.e008'
+)
+
 
 def check_settings_values(app_configs, **kwargs):
     """Checks, if the app-specific settings have valid values."""
@@ -176,6 +186,10 @@ def check_settings_values(app_configs, **kwargs):
         validate_email(settings.DAE_EMAIL_FROM_ADDRESS)
     except (IndexError, ValidationError):
         errors.append(W007)
+
+    # DAE_EMAIL_PREFIX
+    if not isinstance(settings.DAE_EMAIL_PREFIX, six.string_types):
+        errors.append(E008)
 
     # and now hope, this is still empty! ;)
     return errors

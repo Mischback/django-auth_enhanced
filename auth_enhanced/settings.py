@@ -85,8 +85,8 @@ def set_app_default_settings():
     inject_setting('DAE_ADMIN_SIGNUP_NOTIFICATION', False)
 
     # ### DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX
-    # Mails sent by django-auth_enhanced will contain a subject with this
-    #   customizable prefix.
+    # Mails sent to superusers by django-auth_enhanced will contain a subject
+    #   with this customizable prefix.
     inject_setting('DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX', '')
 
     # ### DAE_EMAIL_FROM_ADDRESS
@@ -95,6 +95,12 @@ def set_app_default_settings():
     #   defaults to 'webmaster@localhost' itsself.
     #   You may choose to change the built-in Django-setting or this app's one.
     inject_setting('DAE_EMAIL_FROM_ADDRESS', settings.DEFAULT_FROM_EMAIL)
+
+    # ### DAE_EMAIL_PREFIX
+    # Mails sent by django-auth_enhanced will be prefixed with this string.
+    #   Please note: This does not include emails to superusers, which may use
+    #   'DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX'.
+    inject_setting('DAE_EMAIL_PREFIX', '')
 
     # ### DAE_EMAIL_TEMPLATE_PREFIX
     # This setting determines the place to look for mail templates.
