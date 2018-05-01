@@ -34,18 +34,22 @@ except ImportError:
 class EmailVerificationFormTests(AuthEnhancedTestCase):
     """These tests target the EmailVerificationForm."""
 
-    class MockedEnhancedCrypto(object):
+    class MockVerifyToken(object):
+        """This class just provides necessary mock methods."""
 
-        def verify_token_valid(self, token=None):
+        @staticmethod
+        def verify_token_valid(mock_obj, token=None):
             return 'foo'
 
-        def verify_token_expired(self, token=None):
+        @staticmethod
+        def verify_token_expired(mock_obj, token=None):
             raise SignatureExpired('bar')
 
-        def verify_token_error(self, token=None):
+        @staticmethod
+        def verify_token_error(mock_obj, token=None):
             raise EnhancedCrypto.EnhancedCryptoException('bar')
 
-    @mock.patch('auth_enhanced.crypto.EnhancedCrypto.verify_token', MockedEnhancedCrypto.verify_token_valid)
+    @mock.patch('auth_enhanced.crypto.EnhancedCrypto.verify_token', new=MockVerifyToken.verify_token_valid)
     def test_clean_token_valid(self):
         """A valid token is simply returned and the 'username'-attribute populated.
 
@@ -63,7 +67,7 @@ class EmailVerificationFormTests(AuthEnhancedTestCase):
         self.assertEqual(form.username, 'foo')
 
     @override_settings(DAE_VERIFICATION_TOKEN_MAX_AGE=5)
-    @mock.patch('auth_enhanced.crypto.EnhancedCrypto.verify_token', MockedEnhancedCrypto.verify_token_expired)
+    @mock.patch('auth_enhanced.crypto.EnhancedCrypto.verify_token', new=MockVerifyToken.verify_token_expired)
     def test_clean_token_expired(self):
         """An expired token will state a clear 'ValidationError'.
 
@@ -85,7 +89,7 @@ class EmailVerificationFormTests(AuthEnhancedTestCase):
         )
         self.assertEqual(form.username, None)
 
-    @mock.patch('auth_enhanced.crypto.EnhancedCrypto.verify_token', MockedEnhancedCrypto.verify_token_error)
+    @mock.patch('auth_enhanced.crypto.EnhancedCrypto.verify_token', new=MockVerifyToken.verify_token_error)
     def test_clean_token_error(self):
         """A failing token will raise a 'ValidationError' without real information.
 
@@ -124,8 +128,6 @@ class EmailVerificationFormTests(AuthEnhancedTestCase):
         """A non-existent user can not be activated and raises an exception.
 
         See 'activate_user()'-method."""
-
-        u = get_user_model().objects.create(username='foo', is_active=False)
 
         form = EmailVerificationForm()
         form.username = 'bar'   # this username does not exist

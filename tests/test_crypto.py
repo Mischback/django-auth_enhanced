@@ -29,21 +29,27 @@ except ImportError:
 class EnhancedCryptoTests(AuthEnhancedTestCase):
     """These tests target the EnhancedCrypto class."""
 
-    class MockedTimestampSigner(object):
+    class MockSignUnsign(object):
+        """This class just provides necessary mock methods."""
 
-        def sign(self, item):
+        @staticmethod
+        def sign(mock_obj, item):
             return 'yyyy-mm-dd:{}:{}'.format(item, item)
 
-        def unsign_valid(self, token, max_age=None):
+        @staticmethod
+        def unsign_valid(mock_obj, token, max_age=None):
             return 'foo'
 
-        def unsign_expired(self, token, max_age=None):
+        @staticmethod
+        def unsign_expired(mock_obj, token, max_age=None):
             raise SignatureExpired('bar')
 
-        def unsign_bad_signature(self, token, max_age=None):
+        @staticmethod
+        def unsign_bad_signature(mock_obj, token, max_age=None):
             raise BadSignature('bar')
 
-        def unsign_type_error(self, token, max_age=None):
+        @staticmethod
+        def unsign_type_error(mock_obj, token, max_age=None):
             raise TypeError('bar')
 
     @override_settings(DAE_VERIFICATION_TOKEN_MAX_AGE=5)
@@ -56,7 +62,7 @@ class EnhancedCryptoTests(AuthEnhancedTestCase):
 
         self.assertEqual(c.max_age, 5)
 
-    @mock.patch('django.core.signing.TimestampSigner.sign', MockedTimestampSigner.sign)
+    @mock.patch('django.core.signing.TimestampSigner.sign', new=MockSignUnsign.sign)
     def test_get_token_valid(self):
         """Is a token generated for a valid user object?
 
@@ -84,7 +90,7 @@ class EnhancedCryptoTests(AuthEnhancedTestCase):
         ):
             t = c.get_verification_token(None)  # noqa
 
-    @mock.patch('django.core.signing.TimestampSigner.unsign', MockedTimestampSigner.unsign_valid)
+    @mock.patch('django.core.signing.TimestampSigner.unsign', new=MockSignUnsign.unsign_valid)
     def test_verify_token_valid(self):
         """A valid token returns a username.
 
@@ -95,7 +101,7 @@ class EnhancedCryptoTests(AuthEnhancedTestCase):
 
         self.assertEqual(u, 'foo')
 
-    @mock.patch('django.core.signing.TimestampSigner.unsign', MockedTimestampSigner.unsign_expired)
+    @mock.patch('django.core.signing.TimestampSigner.unsign', new=MockSignUnsign.unsign_expired)
     def test_verify_token_expired(self):
         """An expired token raises a specific exception.
 
@@ -106,7 +112,7 @@ class EnhancedCryptoTests(AuthEnhancedTestCase):
         with self.assertRaisesMessage(SignatureExpired, 'bar'):
             u = c.verify_token(token='foo')  # noqa
 
-    @mock.patch('django.core.signing.TimestampSigner.unsign', MockedTimestampSigner.unsign_bad_signature)
+    @mock.patch('django.core.signing.TimestampSigner.unsign', new=MockSignUnsign.unsign_bad_signature)
     def test_verify_token_bad_signature(self):
         """'BadSignature' is caught and substituted by an own error.
 
@@ -121,7 +127,7 @@ class EnhancedCryptoTests(AuthEnhancedTestCase):
         ):
             u = c.verify_token(token='foo')  # noqa
 
-    @mock.patch('django.core.signing.TimestampSigner.unsign', MockedTimestampSigner.unsign_type_error)
+    @mock.patch('django.core.signing.TimestampSigner.unsign', new=MockSignUnsign.unsign_type_error)
     def test_verify_token_type_error(self):
         """'TypeError' is caught and substituted by an own error.
 
