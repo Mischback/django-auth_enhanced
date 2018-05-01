@@ -78,7 +78,7 @@ class EmailVerificationForm(Form):
         except UserEnhancement.DoesNotExist:
             # logical database integrity FAILED
             # TODO: Should this be raised? Or handle it gracefully by creating an enhancement-object?
-            raise
+            enhancement = UserEnhancement.objects.create(user=user_to_be_activated)
 
         # update the verification status
         enhancement.email_verification_status = enhancement.EMAIL_VERIFICATION_COMPLETED

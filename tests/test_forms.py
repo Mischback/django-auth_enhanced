@@ -2,7 +2,8 @@
 """Includes tests targeting the app-specific forms.
 
     - target file: auth_enhanced/forms.py
-    - included tags: 'forms', 'settings', 'setting_operation_mode', 'signup'
+    - included tags: 'forms', 'settings', 'setting_operation_mode', 'signup',
+        'verification'
 
 The app's checks rely on Django's system check framework."""
 
@@ -11,14 +12,126 @@ from unittest import skip  # noqa
 
 # Django imports
 from django.contrib.auth import get_user_model
+from django.core.signing import SignatureExpired
 from django.forms import ValidationError
 from django.test import override_settings, tag  # noqa
 
 # app imports
-from auth_enhanced.forms import SignupForm
+from auth_enhanced.crypto import EnhancedCrypto
+from auth_enhanced.forms import EmailVerificationForm, SignupForm
+from auth_enhanced.models import UserEnhancement
 
 # app imports
 from .utils.testcases import AuthEnhancedTestCase
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock     # FIXME: How the fuck is this library called in P2.7?!?
+
+
+@tag('forms', 'verification')
+class EmailVerificationFormTests(AuthEnhancedTestCase):
+    """These tests target the EmailVerificationForm."""
+
+    class MockedEnhancedCrypto(object):
+
+        def verify_token_valid(self, token=None):
+            return 'foo'
+
+        def verify_token_expired(self, token=None):
+            raise SignatureExpired('bar')
+
+        def verify_token_error(self, token=None):
+            raise EnhancedCrypto.EnhancedCryptoException('bar')
+
+    @mock.patch('auth_enhanced.crypto.EnhancedCrypto.verify_token', MockedEnhancedCrypto.verify_token_valid)
+    def test_clean_token_valid(self):
+        """A valid token is simply returned and the 'username'-attribute populated.
+
+        See 'clean_token()'-method."""
+
+        form = EmailVerificationForm(
+            data={
+                'token': 'foo',
+            }
+        )
+
+        form.is_valid()
+        cleaned_token = form.clean_token()
+        self.assertEqual(cleaned_token, 'foo')
+        self.assertEqual(form.username, 'foo')
+
+    @override_settings(DAE_VERIFICATION_TOKEN_MAX_AGE=5)
+    @mock.patch('auth_enhanced.crypto.EnhancedCrypto.verify_token', MockedEnhancedCrypto.verify_token_expired)
+    def test_clean_token_expired(self):
+        """An expired token will state a clear 'ValidationError'.
+
+        See 'clean_token()'-method."""
+
+        form = EmailVerificationForm(
+            data={
+                'token': 'foo',
+            }
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertRaisesMessage(
+            ValidationError,
+            "It seems like you have submitted a valid verification "
+            "token, that is expired. Be aware, that verification "
+            "tokens are considered valid for 5 seconds and must be "
+            "used within that time period."
+        )
+        self.assertEqual(form.username, None)
+
+    @mock.patch('auth_enhanced.crypto.EnhancedCrypto.verify_token', MockedEnhancedCrypto.verify_token_error)
+    def test_clean_token_error(self):
+        """A failing token will raise a 'ValidationError' without real information.
+
+        See 'clean_token()'-method."""
+
+        form = EmailVerificationForm(
+            data={
+                'token': 'foo',
+            }
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertRaisesMessage(ValidationError, "Your submitted token could not be verified!")
+        self.assertEqual(form.username, None)
+
+    def test_activate_user_valid(self):
+        """A valid user will get activated and its 'email_verification_status' updated.
+
+        See 'activate_user()'-method.
+
+        This implicitly tests a non-existent UserEnhancement."""
+
+        u = get_user_model().objects.create(username='foo', is_active=False)
+
+        form = EmailVerificationForm()
+        form.username = u.username
+
+        self.assertFalse(u.is_active)
+
+        form.activate_user()
+
+        self.assertTrue(get_user_model().objects.get(username='foo').is_active)
+        self.assertEqual(u.enhancement.email_verification_status, UserEnhancement.EMAIL_VERIFICATION_COMPLETED)
+
+    def test_activate_user_invalid_user(self):
+        """A non-existent user can not be activated and raises an exception.
+
+        See 'activate_user()'-method."""
+
+        u = get_user_model().objects.create(username='foo', is_active=False)
+
+        form = EmailVerificationForm()
+        form.username = 'bar'   # this username does not exist
+
+        with self.assertRaises(get_user_model().DoesNotExist):
+            form.activate_user()
 
 
 @tag('forms', 'signup')
