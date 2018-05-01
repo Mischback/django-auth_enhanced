@@ -16,6 +16,7 @@ class EmailVerificationView(FormView):
 
     def form_valid(self, form):
 
+        # actually activate the user by using a form-method
         form.activate_user()
 
         return super(EmailVerificationView, self).form_valid(form)

@@ -126,3 +126,12 @@ def set_app_default_settings():
     # This salt is used to keep signing processes thoughout your project
     #   nicely seperated. See https://docs.djangoproject.com/en/dev/topics/signing/#using-the-salt-argument
     inject_setting('DAE_SALT', 'django-auth_enhanced')
+
+    # ### DAE_VERIFICATION_TOKEN_MAX_AGE
+    # This setting determines, how long any verification token is considered
+    #   valid.
+    # Possible values:
+    #   - an integer, specifying the maximum age of the token in seconds
+    # TODO: add possible values: strings consisting of a number and a qualifier
+    #   like 'd', 'h', ... parsing of this (into seconds) has to be done somewhere!
+    inject_setting('DAE_VERIFICATION_TOKEN_MAX_AGE', 3600)

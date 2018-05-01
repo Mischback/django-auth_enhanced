@@ -3,7 +3,7 @@
 
 .SILENT:
 .PHONY: benchmark clean coverage doc doc-srv flake8 isort isort-full test \
-		check createsuperuser django migrate runserver
+		check createsuperuser django migrate runserver shell
 
 
 # counts LoCs
@@ -70,7 +70,7 @@ createsuperuser: migrate
 	$(MAKE) django django_cmd="createsuperuser"
 
 # runs commands using the django-admin
-django_cmd ?= shell
+django_cmd ?= version
 django:
 	tox -q -e django -- $(django_cmd)
 
@@ -84,3 +84,8 @@ migrate:
 host_port ?= 0:8080
 runserver: migrate
 	$(MAKE) django django_cmd="runserver $(host_port)"
+
+# runs Django's included shell (basically a shell with the project's settings)
+# applied.
+shell:
+	$(MAKE) django django_cmd="shell"

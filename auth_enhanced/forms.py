@@ -5,10 +5,12 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.core.signing import SignatureExpired
 from django.forms import CharField, Form, ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 # app imports
+from auth_enhanced.crypto import EnhancedCrypto
 from auth_enhanced.settings import (
     DAE_CONST_MODE_EMAIL_ACTIVATION, DAE_CONST_MODE_MANUAL_ACTIVATION,
 )
@@ -19,19 +21,39 @@ class EmailVerificationForm(Form):
 
     token = CharField()
 
+    username = None
+
     def clean_token(self):
+        """This method actually take care of token verification."""
 
-        data = self.cleaned_data['token']
+        token = self.cleaned_data['token']
 
-        # TODO: the token must be verified here, using the crypto module
-        print(data)
+        try:
+            self.username = EnhancedCrypto().verify_token(token)
+            # print("[EmailVerificationForm] successfully verified token for '{}'".format(self.username))
+        except SignatureExpired:
+            raise ValidationError(
+                _(
+                    "It seems like you have submitted a valid verification "
+                    "token, that is expired. Be aware, that verification "
+                    "tokens are considered valid for {} seconds and must be "
+                    "used within that time period.".format(settings.DAE_VERIFICATION_TOKEN_MAX_AGE)
+                ),
+                code='dae_token_expired'
+            )
+        except EnhancedCrypto.EnhancedCryptoException:
+            # TODO: provide some meaningful error message here
+            raise ValidationError(
+                _("Your submitted token could not be verified!"),
+                code='dae_token_could_not_be_verified'
+            )
 
-        return data
+        return token
 
     def activate_user(self):
         """If the submitted token is verified, the account can safely get activated."""
 
-        print('[!] activate_user()')
+        print('[!] activate_user() {}'.format(self.username))
 
 
 class SignupForm(UserCreationForm):
