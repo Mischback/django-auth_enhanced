@@ -13,7 +13,7 @@ from django.conf.urls import url
 from django.contrib.auth.views import LoginView, LogoutView
 
 # app imports
-from auth_enhanced.views import SignupView
+from auth_enhanced.views import EmailVerificationView, SignupView
 
 # specify the app name
 app_name = 'auth_enhanced'
@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^login/$', LoginView.as_view(template_name='auth_enhanced/login.html'), name='login'),
     url(r'^logout/$', LogoutView.as_view(template_name='auth_enhanced/logout.html'), name='logout'),
     url(r'^signup/$', SignupView.as_view(), name='signup'),
+    url(r'^verify-email/$', EmailVerificationView.as_view(), name='email-verification'),
 ]

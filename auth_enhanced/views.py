@@ -2,10 +2,23 @@
 
 # Django imports
 from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, FormView
 
 # app imports
-from auth_enhanced.forms import SignupForm
+from auth_enhanced.forms import EmailVerificationForm, SignupForm
+
+
+class EmailVerificationView(FormView):
+
+    form_class = EmailVerificationForm
+    success_url = reverse_lazy('auth_enhanced:login')
+    template_name = 'auth_enhanced/email_verification.html'
+
+    def form_valid(self, form):
+
+        form.activate_user()
+
+        return super(EmailVerificationView, self).form_valid(form)
 
 
 class SignupView(CreateView):

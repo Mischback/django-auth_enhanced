@@ -5,13 +5,33 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
-from django.forms import ValidationError
+from django.forms import CharField, Form, ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 # app imports
 from auth_enhanced.settings import (
     DAE_CONST_MODE_EMAIL_ACTIVATION, DAE_CONST_MODE_MANUAL_ACTIVATION,
 )
+
+
+class EmailVerificationForm(Form):
+    """Handles email verification by dealing with submitted tokens."""
+
+    token = CharField()
+
+    def clean_token(self):
+
+        data = self.cleaned_data['token']
+
+        # TODO: the token must be verified here, using the crypto module
+        print(data)
+
+        return data
+
+    def activate_user(self):
+        """If the submitted token is verified, the account can safely get activated."""
+
+        print('[!] activate_user()')
 
 
 class SignupForm(UserCreationForm):
