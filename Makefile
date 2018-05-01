@@ -8,11 +8,11 @@
 
 # counts LoCs
 benchmark:
-	tox -e flake8 -- --benchmark
+	tox -q -e flake8 -- --benchmark
 
 # deletes temporary files created by running Django
 clean:
-	- tox -e coverage-report -- coverage erase
+	- tox -q -e coverage-report -- coverage erase
 	find . -iname "*.pyc" -delete
 	find . -iname "__pycache__" -delete
 	find . -iname ".coverage.*" -delete
@@ -21,40 +21,41 @@ clean:
 
 # runs the tests and measures code coverage
 coverage: clean test
-	tox -e coverage-report
+	tox -q -e coverage-report
 
 # builds the documentation using 'Sphinx'
 doc:
-	tox -e doc
+	tox -q -e doc
 
 # serves the documentation (and automatically builds it!)
 doc-srv: doc
-	tox -e doc-srv
+	tox -q -e doc-srv
 
 # runs 'flake8'
 flake8:
-	tox -e flake8
+	tox -q -e flake8
 
 # runs 'isort' in diff-mode, only showing proposed changes
 isort:
-	tox -e isort -- --diff
+	tox -q -e isort -- --diff
 
 # actually executes 'isort' to re-order the imports
 isort-full:
-	tox -e isort
+	tox -q -e isort
 
 # runs the tests in the default environment
+test_cmd ?= ""
 test:
-	tox -e test
+	tox -q -e test -- $(test_cmd)
 
 # runs only tags with a specific tag
 test_tag ?= current
 test-tag:
-	tox -e test -- -t $(test_tag)
+	$(MAKE) test test_cmd="-t $(test_tag)"
 
 # runs the tests with timing information
 test-time:
-	tox -e test -- --time
+	$(MAKE) test test_cmd="--time"
 
 ##### wrapper for django-admin commands #####
 
@@ -69,9 +70,9 @@ createsuperuser: migrate
 	$(MAKE) django django_cmd="createsuperuser"
 
 # runs commands using the django-admin
-django_cmd ?= version
+django_cmd ?= shell
 django:
-	tox -e django -- $(django_cmd)
+	tox -q -e django -- $(django_cmd)
 
 # apply the migrations into the default environment
 # django-admin.py migrate -v 0
