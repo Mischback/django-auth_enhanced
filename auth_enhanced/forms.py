@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 
 # app imports
 from auth_enhanced.crypto import EnhancedCrypto
+from auth_enhanced.models import UserEnhancement
 from auth_enhanced.settings import (
     DAE_CONST_MODE_EMAIL_ACTIVATION, DAE_CONST_MODE_MANUAL_ACTIVATION,
 )
@@ -22,6 +23,13 @@ class EmailVerificationForm(Form):
     token = CharField()
 
     username = None
+
+    # let's mimic the behaviour of 'UserCreationForm'. And yes, this is dirty (;
+    class Meta:
+        # be as pluggable as possible, so django.contrib.auth's User is not
+        #   directly referenced
+        model = get_user_model()
+    _meta = Meta
 
     def clean_token(self):
         """This method actually take care of token verification."""
@@ -53,7 +61,32 @@ class EmailVerificationForm(Form):
     def activate_user(self):
         """If the submitted token is verified, the account can safely get activated."""
 
-        print('[!] activate_user() {}'.format(self.username))
+        user_to_be_activated = None
+        user_query = {
+            self._meta.model.USERNAME_FIELD: self.username,
+        }
+        try:
+            user_to_be_activated = self._meta.model.objects.get(**user_query)
+        except self._meta.model.DoesNotExist:
+            # the user could not be found
+            raise
+
+        # the following part could be done more defensively, if guarded with
+        #   'if user_to_be_activated:'
+        try:
+            enhancement = UserEnhancement.objects.get(user=user_to_be_activated)
+        except UserEnhancement.DoesNotExist:
+            # logical database integrity FAILED
+            # TODO: Should this be raised? Or handle it gracefully by creating an enhancement-object?
+            raise
+
+        # update the verification status
+        enhancement.email_verification_status = enhancement.EMAIL_VERIFICATION_COMPLETED
+        enhancement.save(update_fields=['email_verification_status'])
+
+        # activate the user
+        user_to_be_activated.is_active = True
+        user_to_be_activated.save(update_fields=['is_active'])
 
 
 class SignupForm(UserCreationForm):
@@ -96,7 +129,7 @@ class SignupForm(UserCreationForm):
         # perform some email validation tasks
         email = cleaned_data.get(self._meta.model.EMAIL_FIELD)
 
-        # enfoce a valid email address (if required)
+        # enforce a valid email address (if required)
         if settings.DAE_OPERATION_MODE == DAE_CONST_MODE_EMAIL_ACTIVATION and not email:
             raise ValidationError(
                 _('A valid email address is required!'),

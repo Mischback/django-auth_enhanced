@@ -57,7 +57,7 @@ class EnhancedCrypto(object):
         Returns the value, that has been signed to be re-used later."""
 
         try:
-            val =  self.signer.unsign(token, max_age=self.max_age)
+            val = self.signer.unsign(token, max_age=self.max_age)
         # ok, the order of catching is relevant here...
         except SignatureExpired:
             raise
