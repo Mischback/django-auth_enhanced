@@ -177,8 +177,9 @@ class SignupForm(UserCreationForm):
         # call the parent's 'save()' without saving
         user = super(SignupForm, self).save(commit=False)
 
-        # 'DAE_MODE_MANUAL_ACTIVATION' implies 'is_active' = False
-        if settings.DAE_OPERATION_MODE == DAE_CONST_MODE_MANUAL_ACTIVATION:
+        # 'DAE_CONST_MODE_MANUAL_ACTIVATION' or 'DAE_CONST_MODE_EMAIL_ACTIVATION'
+        # implies 'is_active' = False
+        if settings.DAE_OPERATION_MODE in (DAE_CONST_MODE_MANUAL_ACTIVATION, DAE_CONST_MODE_EMAIL_ACTIVATION):
             user.is_active = False
 
         if commit:

@@ -190,7 +190,7 @@ class SignupFormTests(AuthEnhancedTestCase):
     @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_AUTO_ACTIVATION')
     def test_save_is_active_auto_true(self):
         """If 'DAE_OPERATION_MODE' is set to automatic activation, the user
-        object is created with 'is_active' = False.
+        object is created with 'is_active' = True.
 
         See 'save()'-method."""
 
@@ -208,7 +208,7 @@ class SignupFormTests(AuthEnhancedTestCase):
 
     @tag('settings', 'setting_operation_mode')
     @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_MANUAL_ACTIVATION')
-    def test_save_is_active_auto_false(self):
+    def test_save_is_active_auto_false_manual(self):
         """Depending on the 'DAE_OPERATION_MODE'-setting the user object is
         created with 'is_active' = False.
 
@@ -217,6 +217,27 @@ class SignupFormTests(AuthEnhancedTestCase):
         form = SignupForm(
             data={
                 get_user_model().USERNAME_FIELD: 'foo',
+                'password1': 'foo',
+                'password2': 'foo'
+            }
+        )
+        self.assertTrue(form.is_valid())
+
+        user = form.save()
+        self.assertFalse(user.is_active)
+
+    @tag('settings', 'setting_operation_mode')
+    @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_EMAIL_ACTIVATION')
+    def test_save_is_active_auto_false_email(self):
+        """Depending on the 'DAE_OPERATION_MODE'-setting the user object is
+        created with 'is_active' = False.
+
+        See 'save()'-method."""
+
+        form = SignupForm(
+            data={
+                get_user_model().USERNAME_FIELD: 'foo',
+                get_user_model().EMAIL_FIELD: 'foo@localhost',
                 'password1': 'foo',
                 'password2': 'foo'
             }
