@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
 # app imports
+from auth_enhanced.crypto import EnhancedCrypto
 from auth_enhanced.exceptions import AuthEnhancedException
 from auth_enhanced.settings import (
     DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_MODE_EMAIL_ACTIVATION,
@@ -152,6 +153,7 @@ def callback_user_signup_email_verification(sender, instance, created, **kwargs)
         mail = AuthEnhancedEmail(
             context={
                 'new_user': instance,
+                'verification_token': EnhancedCrypto().get_verification_token(instance),
                 'webmaster_email': settings.DAE_EMAIL_FROM_ADDRESS,  # TODO: see notice above
             },
             from_email=settings.DAE_EMAIL_FROM_ADDRESS,

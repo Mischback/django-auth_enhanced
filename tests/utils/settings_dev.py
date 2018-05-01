@@ -86,7 +86,9 @@ LOGIN_REDIRECT_URL = '/'
 # just for development. Doesn't work for tests (locmem?)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# ### CURRENT DEVELOPMENT
-# DAE_ADMIN_SIGNUP_NOTIFICATION = (
-#     ('django', 'django@localhost', ('mail', )),
-# )
+### CURRENT DEVELOPMENT
+DAE_ADMIN_SIGNUP_NOTIFICATION = (
+    ('django', 'django@localhost', ('mail', )),
+)
+
+DAE_OPERATION_MODE = 'DAE_CONST_MODE_EMAIL_ACTIVATION'

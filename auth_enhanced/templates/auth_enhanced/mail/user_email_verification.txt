@@ -6,6 +6,10 @@ Hello {{ new_user.username }}!
 
 You just completed the the signup process at *django-auth_enhanced*. To activate your account and enable login, you have to verify your email address.
 
+Please visit the following link and enter your verification token:
+    >> http://deb9:8080/verification-url-here
+    >> Token: {{ verification_token }}
+
 
 
 ** Notice
