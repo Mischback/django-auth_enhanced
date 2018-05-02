@@ -16,6 +16,7 @@ from django.test import override_settings, tag  # noqa
 # app imports
 from auth_enhanced.email import (
     AuthEnhancedEmail, callback_admin_information_new_signup,
+    callback_user_signup_email_verification,
 )
 from auth_enhanced.settings import (
     DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_MODE_EMAIL_ACTIVATION,
@@ -180,7 +181,7 @@ class AdminInformationNewSignupTests(AuthEnhancedTestCase):
 
     @override_settings(DAE_OPERATION_MODE='foo')
     def test_callback_apply_mode_none(self):
-        """Is 'context['mode_manual']' set?
+        """With an invalid operation mode, no context is applied.
 
         See 'callback_admin_information_new_signup()'-function."""
 
@@ -200,3 +201,46 @@ class AdminInformationNewSignupTests(AuthEnhancedTestCase):
             mail.outbox[0].body
         )
         self.assertNotIn('uses a signup system that requires the manual activation of accounts', mail.outbox[0].body)
+
+
+@tag('email')
+@override_settings(
+    DAE_ADMIN_SIGNUP_NOTIFICATION=(('django', 'django@localhost', ('mail', )), ),
+    DAE_EMAIL_PREFIX='',
+    DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION
+)
+class UserSignupEmailVerificationTests(AuthEnhancedTestCase):
+    """These tests target the 'callback_user_signup_email_verification'-function."""
+
+    def test_callback_not_created(self):
+        """If this is not a newly created object, do nothing.
+
+        See 'callback_user_signup_email_verification()'-function."""
+
+        retval = callback_user_signup_email_verification(
+            get_user_model(),
+            None,
+            False,  # this is the relevant 'created' parameter!
+        )
+        self.assertFalse(retval)
+
+    @tag('current')
+    @override_settings(DAE_EMAIL_PREFIX='foo')
+    def test_callback_subject_prefix(self):
+        """Is the subject line modified?
+
+        See 'callback_user_signup_email_verification()'-function."""
+
+        # create a User object to pass along
+        u = get_user_model().objects.create(username='foo', email='foo@localhost')
+
+        retval = callback_user_signup_email_verification(
+            get_user_model(),
+            u,
+            True
+        )
+        self.assertTrue(retval)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, '[{}] Email Verification Mail'.format(
+            settings.DAE_EMAIL_PREFIX
+        ))
