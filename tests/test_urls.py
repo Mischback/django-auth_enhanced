@@ -39,3 +39,30 @@ class UrlTests(AEUrlTestCase):
         self.assertEqual(url, '/logout/')
 
         self.assertCBVName('LogoutView', module='django.contrib.auth.views', url=url)
+
+    def test_signup_url(self):
+        """Can the URL be retrieved by its name and is the right function used?"""
+
+        # get the URL by its name
+        url = reverse('auth_enhanced:signup')
+        self.assertEqual(url, '/signup/')
+
+        self.assertCBVName('SignupView', module='auth_enhanced.views', url=url)
+
+    def test_verify_email_url_no_token(self):
+        """Can the URL be retrieved by its name and is the right function used?"""
+
+        # get the URL by its name
+        url = reverse('auth_enhanced:email-verification')
+        self.assertEqual(url, '/verify-email/')
+
+        self.assertCBVName('EmailVerificationView', module='auth_enhanced.views', url=url)
+
+    def test_verify_email_url_with_token(self):
+        """Can the URL be retrieved by its name and is the right function used?"""
+
+        # get the URL by its name
+        url = reverse('auth_enhanced:email-verification', kwargs={'verification_token': 'foo'})
+        self.assertEqual(url, '/verify-email/foo/')
+
+        self.assertCBVName('EmailVerificationView', module='auth_enhanced.views', url=url)

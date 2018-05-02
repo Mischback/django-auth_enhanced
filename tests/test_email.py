@@ -224,7 +224,6 @@ class UserSignupEmailVerificationTests(AuthEnhancedTestCase):
         )
         self.assertFalse(retval)
 
-    @tag('current')
     @override_settings(DAE_EMAIL_PREFIX='foo')
     def test_callback_subject_prefix(self):
         """Is the subject line modified?
