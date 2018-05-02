@@ -22,7 +22,7 @@ from .utils.testcases import AuthEnhancedTestCase
 try:
     from unittest import mock
 except ImportError:
-    import mock     # FIXME: How the fuck is this library called in P2.7?!?
+    import mock
 
 
 @tag('crypto')
