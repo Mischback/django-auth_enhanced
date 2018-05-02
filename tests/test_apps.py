@@ -13,7 +13,9 @@ from django.db.models import signals
 from django.test import override_settings, tag  # noqa
 
 # app imports
-from auth_enhanced.settings import DAE_CONST_MODE_EMAIL_ACTIVATION
+from auth_enhanced.settings import (
+    DAE_CONST_MODE_EMAIL_ACTIVATION, DAE_CONST_MODE_MANUAL_ACTIVATION,
+)
 
 # app imports
 from .utils.testcases import AuthEnhancedPerTestDeactivatedSignalsTestCase
@@ -23,9 +25,12 @@ from .utils.testcases import AuthEnhancedPerTestDeactivatedSignalsTestCase
 class AuthEnhancedConfigTests(AuthEnhancedPerTestDeactivatedSignalsTestCase):
     """These tests target the AppConfig."""
 
-    @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=False)
+    @override_settings(
+        DAE_ADMIN_SIGNUP_NOTIFICATION=False,
+        DAE_OPERATION_MODE=DAE_CONST_MODE_MANUAL_ACTIVATION
+    )
     def test_default_signals_registered(self):
-        """Are the signals registered successfully?
+        """Only 'DAE_create_enhance_user_object' is registered.
 
         See 'ready()'-method.
 
@@ -41,10 +46,11 @@ class AuthEnhancedConfigTests(AuthEnhancedPerTestDeactivatedSignalsTestCase):
         dispatch_uids = [x[0][0] for x in signals.post_save.receivers]
         self.assertIn('DAE_create_enhance_user_object', dispatch_uids)
         self.assertNotIn('DAE_admin_information_new_signup', dispatch_uids)
+        self.assertNotIn('DAE_user_signup_email_verification', dispatch_uids)
 
-    @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=(('foo', 'foo@localhost', ('mail', )), ))
+    @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=(('foo', 'foo@localhost', ('mail', )), ),)
     def test_admin_signup_notification_registered(self):
-        """Are the signals registered successfully?
+        """'DAE_admin_information_new_signup' is registered.
 
         See 'ready()'-method.
 
@@ -63,7 +69,7 @@ class AuthEnhancedConfigTests(AuthEnhancedPerTestDeactivatedSignalsTestCase):
 
     @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
     def test_user_signup_email_verification_registered(self):
-        """Are the signals registered successfully?
+        """'DAE_user_signup_email_verification' is registered.
 
         See 'ready()'-method.
 
