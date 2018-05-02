@@ -16,7 +16,8 @@ from auth_enhanced.email import (
 )
 from auth_enhanced.exceptions import AuthEnhancedConversionError
 from auth_enhanced.settings import (
-    DAE_CONST_MODE_EMAIL_ACTIVATION, DAE_CONST_VERIFICATION_TOKEN_MAX_AGE, convert_to_seconds, set_app_default_settings,
+    DAE_CONST_MODE_EMAIL_ACTIVATION, DAE_CONST_VERIFICATION_TOKEN_MAX_AGE,
+    convert_to_seconds, set_app_default_settings,
 )
 
 

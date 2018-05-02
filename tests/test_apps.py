@@ -19,7 +19,9 @@ from auth_enhanced.settings import (
 )
 
 # app imports
-from .utils.testcases import AuthEnhancedTestCase, AuthEnhancedPerTestDeactivatedSignalsTestCase
+from .utils.testcases import (
+    AuthEnhancedPerTestDeactivatedSignalsTestCase, AuthEnhancedTestCase,
+)
 
 
 @tag('appconfig')

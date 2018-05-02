@@ -14,7 +14,7 @@ from django.test import override_settings, tag  # noqa
 
 # app imports
 from auth_enhanced.checks import (
-    E001, E002, E003, E004, E008, E009, W005, W006, W007,
+    E001, E002, E003, E004, E008, E009, E010, W005, W006, W007,
     check_settings_values,
 )
 from auth_enhanced.settings import (
@@ -159,3 +159,17 @@ class CheckSettingsValuesTests(AuthEnhancedTestCase):
         """Invalid values show an error message."""
         errors = check_settings_values(None)
         self.assertEqual(errors, [E009])
+
+    @override_settings(DAE_VERIFICATION_TOKEN_MAX_AGE=1338)
+    def test_e010_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_VERIFICATION_TOKEN_MAX_AGE=None)
+    def test_e010_invalid(self):
+        """Invalid values show an error message.
+
+        Actually, 'None' is the only way to raise this error."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E010])

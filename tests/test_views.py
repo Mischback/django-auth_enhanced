@@ -10,7 +10,7 @@ from unittest import skip  # noqa
 
 # Django imports
 from django.contrib.auth import get_user_model
-from django.test import override_settings, RequestFactory, tag  # noqa
+from django.test import RequestFactory, override_settings, tag  # noqa
 
 # app imports
 from auth_enhanced.exceptions import AuthEnhancedException

@@ -125,6 +125,17 @@ E009 = Error(
     id='dae.e009'
 )
 
+# DAE_VERIFICATION_TOKEN_MAX_AGE
+E010 = Error(
+    _("'DAE_VERIFICATION_TOKEN_MAX_AGE' has to be an integer!"),
+    hint=_(
+        "Please check your settings and ensure, that "
+        "'DAE_VERIFICATION_TOKEN_MAX_AGE' is set to an integer value or a "
+        "string with either a trailing 'h' or 'd' and leading numbers."
+    ),
+    id='dae.e010'
+)
+
 
 def check_settings_values(app_configs, **kwargs):
     """Checks, if the app-specific settings have valid values."""
@@ -205,6 +216,10 @@ def check_settings_values(app_configs, **kwargs):
     # DAE_SALT
     if not isinstance(settings.DAE_SALT, six.string_types):
         errors.append(E009)
+
+    # DAE_VERIFICATION_TOKEN_MAX_AGE
+    if not isinstance(settings.DAE_VERIFICATION_TOKEN_MAX_AGE, six.integer_types):
+        errors.append(E010)
 
     # and now hope, this is still empty! ;)
     return errors
