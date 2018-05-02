@@ -6,6 +6,7 @@ from django.apps import AppConfig
 from django.conf import settings
 from django.core.checks import register
 from django.db.models.signals import post_save
+from django.utils import six
 
 # app imports
 from auth_enhanced.checks import check_settings_values
@@ -13,8 +14,9 @@ from auth_enhanced.email import (
     callback_admin_information_new_signup,
     callback_user_signup_email_verification,
 )
+from auth_enhanced.exceptions import AuthEnhancedConversionError
 from auth_enhanced.settings import (
-    DAE_CONST_MODE_EMAIL_ACTIVATION, set_app_default_settings,
+    DAE_CONST_MODE_EMAIL_ACTIVATION, DAE_CONST_VERIFICATION_TOKEN_MAX_AGE, convert_to_seconds, set_app_default_settings,
 )
 
 
@@ -34,6 +36,21 @@ class AuthEnhancedConfig(AppConfig):
 
         # apply the default settings
         set_app_default_settings()
+
+        # convert time-strings to seconds
+        if isinstance(settings.DAE_VERIFICATION_TOKEN_MAX_AGE, six.string_types):
+            try:
+                setattr(
+                    settings,
+                    'DAE_VERIFICATION_TOKEN_MAX_AGE',
+                    convert_to_seconds(settings.DAE_VERIFICATION_TOKEN_MAX_AGE)
+                )
+            except AuthEnhancedConversionError:
+                setattr(
+                    settings,
+                    'DAE_VERIFICATION_TOKEN_MAX_AGE',
+                    DAE_CONST_VERIFICATION_TOKEN_MAX_AGE
+                )
 
         # register app-specific system checks
         register(check_settings_values)

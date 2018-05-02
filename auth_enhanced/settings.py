@@ -46,6 +46,10 @@ DAE_CONST_MODE_MANUAL_ACTIVATION = 'DAE_CONST_MODE_MANUAL_ACTIVATION'
 # the name of the login url, as specified in 'urls.py'
 DAE_CONST_RECOMMENDED_LOGIN_URL = 'auth_enhanced:login'
 
+# this is the default value for DAE_VERIFICATION_TOKEN_MAX_AGE. It is directly
+#   given in seconds, because it is the fallback value used in AppConfig
+DAE_CONST_VERIFICATION_TOKEN_MAX_AGE = 3600
+
 
 # #############################################################################
 # FUNCTIONS
@@ -153,4 +157,4 @@ def set_app_default_settings():
     #   - an integer, specifying the maximum age of the token in seconds
     # TODO: add possible values: strings consisting of a number and a qualifier
     #   like 'd', 'h', ... parsing of this (into seconds) has to be done somewhere!
-    inject_setting('DAE_VERIFICATION_TOKEN_MAX_AGE', 3600)
+    inject_setting('DAE_VERIFICATION_TOKEN_MAX_AGE', DAE_CONST_VERIFICATION_TOKEN_MAX_AGE)

@@ -9,6 +9,7 @@ from unittest import skip  # noqa
 
 # Django imports
 from django.apps import apps
+from django.conf import settings
 from django.db.models import signals
 from django.test import override_settings, tag  # noqa
 
@@ -18,12 +19,33 @@ from auth_enhanced.settings import (
 )
 
 # app imports
-from .utils.testcases import AuthEnhancedPerTestDeactivatedSignalsTestCase
+from .utils.testcases import AuthEnhancedTestCase, AuthEnhancedPerTestDeactivatedSignalsTestCase
 
 
 @tag('appconfig')
-class AuthEnhancedConfigTests(AuthEnhancedPerTestDeactivatedSignalsTestCase):
-    """These tests target the AppConfig."""
+class AuthEnhancedConfigTests(AuthEnhancedTestCase):
+    """These tests target the AppConfig, without any signal handling."""
+
+    @override_settings(DAE_VERIFICATION_TOKEN_MAX_AGE='1h')
+    def test_convert_time_strings(self):
+        """Time strings are converted to seconds."""
+
+        self.assertEqual(settings.DAE_VERIFICATION_TOKEN_MAX_AGE, '1h')
+        apps.get_app_config('auth_enhanced').ready()
+        self.assertEqual(settings.DAE_VERIFICATION_TOKEN_MAX_AGE, 3600)
+
+    @override_settings(DAE_VERIFICATION_TOKEN_MAX_AGE='foo')
+    def test_convert_use_fallback(self):
+        """If conversion fails, a fallback will be applied."""
+
+        self.assertEqual(settings.DAE_VERIFICATION_TOKEN_MAX_AGE, 'foo')
+        apps.get_app_config('auth_enhanced').ready()
+        self.assertEqual(settings.DAE_VERIFICATION_TOKEN_MAX_AGE, 3600)
+
+
+@tag('appconfig')
+class AuthEnhancedConfigSignalTests(AuthEnhancedPerTestDeactivatedSignalsTestCase):
+    """These tests target the AppConfig, especially the signal handling."""
 
     @override_settings(
         DAE_ADMIN_SIGNUP_NOTIFICATION=False,
