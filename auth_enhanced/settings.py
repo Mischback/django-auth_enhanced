@@ -13,6 +13,9 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _  # noqa
 
+# app imports
+from auth_enhanced.exceptions import AuthEnhancedConversionError
+
 # #############################################################################
 # CONSTANTS
 # #############################################################################
@@ -47,6 +50,22 @@ DAE_CONST_RECOMMENDED_LOGIN_URL = 'auth_enhanced:login'
 # #############################################################################
 # FUNCTIONS
 # #############################################################################
+
+def convert_to_seconds(time_str):
+    """Converts a string to a time-integer, specifying the seconds."""
+
+    try:
+        if time_str[-1:] == 'h':
+            seconds = int(time_str[:-1]) * 3600
+        elif time_str[-1:] == 'd':
+            seconds = int(time_str[:-1]) * 3600 * 24
+        else:
+            seconds = int(time_str)
+    except ValueError:
+        raise AuthEnhancedConversionError(_("Could not convert the parameter to an integer value."))
+
+    return seconds
+
 
 def inject_setting(name, default_value):
     """Injects an app-specific setting into Django's settings module.
