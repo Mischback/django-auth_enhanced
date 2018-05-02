@@ -43,7 +43,7 @@ urlpatterns = [
     url(r'^signup/$', SignupView.as_view(), name='signup'),
     # 'email-verification' may be called with or without an url parameter
     url(
-        r'^verify-email(?:/(?P<verification_token>[a-zA-Z0-9:]+))?/$',
+        r'^verify-email(?:/(?P<verification_token>[A-z0-9-_=:]+))?/$',
         EmailVerificationView.as_view(),
         name='email-verification'
     ),
