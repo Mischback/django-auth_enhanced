@@ -20,6 +20,10 @@ from django.test import override_settings, tag  # noqa
 from auth_enhanced.crypto import EnhancedCrypto
 from auth_enhanced.forms import EmailVerificationForm, SignupForm
 from auth_enhanced.models import UserEnhancement
+from auth_enhanced.settings import (
+    DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_MODE_EMAIL_ACTIVATION,
+    DAE_CONST_MODE_MANUAL_ACTIVATION,
+)
 
 # app imports
 from .utils.testcases import AuthEnhancedTestCase
@@ -146,7 +150,7 @@ class SignupFormTests(AuthEnhancedTestCase):
     TODO: Cache 'get_user_model()' in class variable or something..."""
 
     @tag('settings', 'setting_operation_mode')
-    @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_AUTO_ACTIVATION')
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_AUTO_ACTIVATION)
     def test_exclude_email_field_1(self):
         """The email field should be removed, if it is not required.
 
@@ -156,7 +160,7 @@ class SignupFormTests(AuthEnhancedTestCase):
         self.assertNotIn(get_user_model().EMAIL_FIELD, form.fields)
 
     @tag('settings', 'setting_operation_mode')
-    @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_MANUAL_ACTIVATION')
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_MANUAL_ACTIVATION)
     def test_exclude_email_field_2(self):
         """The email field should be removed, if it is not required.
 
@@ -166,7 +170,7 @@ class SignupFormTests(AuthEnhancedTestCase):
         self.assertNotIn(get_user_model().EMAIL_FIELD, form.fields)
 
     @tag('settings', 'setting_operation_mode')
-    @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_EMAIL_ACTIVATION')
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
     def test_include_email_field(self):
         """The email field should be included, if it is required.
 
@@ -176,7 +180,7 @@ class SignupFormTests(AuthEnhancedTestCase):
         self.assertIn(get_user_model().EMAIL_FIELD, form.fields)
 
     @tag('settings', 'setting_operation_mode')
-    @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_EMAIL_ACTIVATION')
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
     def test_required_email_field_missing(self):
         """Enforce required email addresses.
 
@@ -193,7 +197,7 @@ class SignupFormTests(AuthEnhancedTestCase):
         self.assertRaisesMessage(ValidationError, 'A valid email address is required!')
 
     @tag('settings', 'setting_operation_mode')
-    @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_EMAIL_ACTIVATION')
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
     def test_required_email_field_empty(self):
         """Enforce required email addresses.
 
@@ -211,7 +215,7 @@ class SignupFormTests(AuthEnhancedTestCase):
         self.assertRaisesMessage(ValidationError, 'A valid email address is required!')
 
     @tag('settings', 'setting_operation_mode')
-    @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_EMAIL_ACTIVATION')
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
     def test_required_email_field_invalid(self):
         """Enforce required email addresses.
 
@@ -232,7 +236,7 @@ class SignupFormTests(AuthEnhancedTestCase):
         self.assertRaisesMessage(ValidationError, 'A valid email address is required!')
 
     @tag('settings', 'setting_operation_mode')
-    @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_EMAIL_ACTIVATION')
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
     def test_required_email_field_valid(self):
         """Enforce required email addresses.
 
@@ -249,7 +253,7 @@ class SignupFormTests(AuthEnhancedTestCase):
         self.assertTrue(form.is_valid())
 
     @tag('settings', 'setting_operation_mode')
-    @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_EMAIL_ACTIVATION')
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
     def test_unique_email(self):
         """An email address must not be registered twice!
 
@@ -274,7 +278,7 @@ class SignupFormTests(AuthEnhancedTestCase):
             'This email address is already in use! Email addresses may only be registered once!'
         )
 
-    @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_AUTO_ACTIVATION')
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_AUTO_ACTIVATION)
     def test_save_no_commit(self):
         """SignupForm's 'save()'-method may be called without commiting.
 
@@ -302,7 +306,7 @@ class SignupFormTests(AuthEnhancedTestCase):
             })                                              # noqa
 
     @tag('settings', 'setting_operation_mode')
-    @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_AUTO_ACTIVATION')
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_AUTO_ACTIVATION)
     def test_save_is_active_auto_true(self):
         """If 'DAE_OPERATION_MODE' is set to automatic activation, the user
         object is created with 'is_active' = True.
@@ -322,7 +326,7 @@ class SignupFormTests(AuthEnhancedTestCase):
         self.assertTrue(user.is_active)
 
     @tag('settings', 'setting_operation_mode')
-    @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_MANUAL_ACTIVATION')
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_MANUAL_ACTIVATION)
     def test_save_is_active_auto_false_manual(self):
         """Depending on the 'DAE_OPERATION_MODE'-setting the user object is
         created with 'is_active' = False.
@@ -342,7 +346,7 @@ class SignupFormTests(AuthEnhancedTestCase):
         self.assertFalse(user.is_active)
 
     @tag('settings', 'setting_operation_mode')
-    @override_settings(DAE_OPERATION_MODE='DAE_CONST_MODE_EMAIL_ACTIVATION')
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
     def test_save_is_active_auto_false_email(self):
         """Depending on the 'DAE_OPERATION_MODE'-setting the user object is
         created with 'is_active' = False.

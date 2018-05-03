@@ -149,7 +149,8 @@ def check_settings_values(app_configs, **kwargs):
         errors.append(E001)
 
     # DAE_EMAIL_TEMPLATE_PREFIX
-    if settings.DAE_EMAIL_TEMPLATE_PREFIX[-1:] == '/':
+    if (settings.DAE_EMAIL_TEMPLATE_PREFIX[-1:] == '/' or
+            not isinstance(settings.DAE_EMAIL_TEMPLATE_PREFIX, six.string_types)):
         errors.append(E002)
 
     # DAE_ADMIN_SIGNUP_NOTIFICATION

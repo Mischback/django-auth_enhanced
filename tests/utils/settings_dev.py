@@ -91,4 +91,4 @@ DAE_ADMIN_SIGNUP_NOTIFICATION = (
     ('django', 'django@localhost', ('mail', )),
 )
 
-DAE_OPERATION_MODE = 'DAE_CONST_MODE_EMAIL_ACTIVATION'
+DAE_OPERATION_MODE = 'email-verification'

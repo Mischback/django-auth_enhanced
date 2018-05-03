@@ -26,15 +26,15 @@ from auth_enhanced.exceptions import AuthEnhancedConversionError
 DAE_CONST_EMAIL_TEMPLATE_PREFIX = 'auth_enhanced/mail'
 
 # This mode will automatically activate newly registered accounts
-DAE_CONST_MODE_AUTO_ACTIVATION = 'DAE_CONST_MODE_AUTO_ACTIVATION'
+DAE_CONST_MODE_AUTO_ACTIVATION = 'auto'
 
 # This mode sends a verification email and will automaticall activate the
 #   newly registered account after successfull verification
-DAE_CONST_MODE_EMAIL_ACTIVATION = 'DAE_CONST_MODE_EMAIL_ACTIVATION'
+DAE_CONST_MODE_EMAIL_ACTIVATION = 'email-verification'
 
 # This mode will *NOT* activate newly registered accounts and relies on manual
 #   activation by a superuser
-DAE_CONST_MODE_MANUAL_ACTIVATION = 'DAE_CONST_MODE_MANUAL_ACTIVATION'
+DAE_CONST_MODE_MANUAL_ACTIVATION = 'manual'
 
 # contains the app's operation modes to be used in a model (choices) field
 # DAE_CONST_OPERATION_MODE_CHOICES = (
