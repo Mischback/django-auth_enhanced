@@ -155,6 +155,4 @@ def set_app_default_settings():
     #   valid.
     # Possible values:
     #   - an integer, specifying the maximum age of the token in seconds
-    # TODO: add possible values: strings consisting of a number and a qualifier
-    #   like 'd', 'h', ... parsing of this (into seconds) has to be done somewhere!
     inject_setting('DAE_VERIFICATION_TOKEN_MAX_AGE', DAE_CONST_VERIFICATION_TOKEN_MAX_AGE)
