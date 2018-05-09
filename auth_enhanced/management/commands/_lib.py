@@ -34,7 +34,7 @@ def check_email_uniqueness(stdout):
             user_model.objects.filter(
                 # this really complex statement is used, to not reference the
                 #   'email' field directly, to be as pluggable as possible
-                **{ '{}__in'.format(user_model.EMAIL_FIELD): non_unique_emails }
+                **{'{}__in'.format(user_model.EMAIL_FIELD): non_unique_emails}
             )
             # simply list the usernames
             .values_list(user_model.USERNAME_FIELD, flat=True)
