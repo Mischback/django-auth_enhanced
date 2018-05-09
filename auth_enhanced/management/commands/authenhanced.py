@@ -5,6 +5,9 @@ check certain bits of 'django-auth_ehanced'."""
 # Django imports
 from django.core.management.base import BaseCommand, CommandError
 
+# app imports
+from auth_enhanced.management.commands._lib import check_email_uniqueness
+
 
 class Command(BaseCommand):
     """Provides the command 'authenhanced'."""
@@ -34,7 +37,7 @@ class Command(BaseCommand):
         self.cmd = options['cmd'][0]
 
         if 'unique-email' == self.cmd:
-            self.stdout.write('[.] checking for non-unique email addresses')
+            check_email_uniqueness(self.stdout)
         elif 'admin-notification' == self.cmd:
             self.stdout.write('[.] checking the admin notification setting')
         elif 'full' == self.cmd:
