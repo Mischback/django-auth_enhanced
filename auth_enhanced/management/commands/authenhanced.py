@@ -35,22 +35,23 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Check, which of the available commands is to be executed."""
 
-        # self.stdout.write('[!] found command {}'.format(options['cmd']))
         self.cmd = options['cmd'][0]
 
-        if 'unique-email' == self.cmd:
+        if self.cmd not in ('unique-email', 'admin-notification', 'full'):
+            raise CommandError("No valid command was provided!")
+
+        if self.cmd in ('unique-email', 'full'):
             if check_email_uniqueness():
                 # all email addresses are unique!
-                self.stdout.write('[ok] All email addresses are unique!')
-        elif 'admin-notification' == self.cmd:
+                self.stdout.write(
+                    self.style.SUCCESS('[ok] All email addresses are unique!')
+                )
+
+        if self.cmd in ('admin-notification', 'full'):
             if check_admin_notification():
-                self.stdout.write('[ok] Notification settings are valid!')
-        elif 'full' == self.cmd:
-            self.stdout.write('Performing all app-specific checks!')
-            if check_email_uniqueness() and check_admin_notification():
-                self.stdout.write('[ok] All app-specific tests passed!')
-        else:
-            raise CommandError("No valid command was provided!")
+                self.stdout.write(
+                    self.style.SUCCESS('[ok] Notification settings are valid!')
+                )
 
     def get_version(self):
         """By overriding this method, the app can provide its own version."""
