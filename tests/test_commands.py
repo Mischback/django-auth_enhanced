@@ -22,15 +22,30 @@ from auth_enhanced.management.commands.authenhanced import (
 from .utils.testcases import AuthEnhancedTestCase
 
 try:
+    # Python 2.7 has to come before Python 3!
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
+
+try:
+    # Python 3
+    from unittest import mock
+except ImportError:
+    # Python 2.7
+    import mock
 
 
 @tag('command')
 class CheckAuthEnhancedCommand(AuthEnhancedTestCase):
     """This tests target the parts of the command logic, that is not really
     involved in checking."""
+
+    class MockCheckFunctions:
+        """This class just provides necessary mock methods."""
+
+        @staticmethod
+        def return_true():
+            return True
 
     def test_unknown_command(self):
         """Unknown commands raise an error."""
@@ -40,6 +55,52 @@ class CheckAuthEnhancedCommand(AuthEnhancedTestCase):
 
         with self.assertRaisesMessage(CommandError, "No valid command was provided!"):
             call_command('authenhanced', 'foo', stdout=out)
+
+    @mock.patch(
+        'auth_enhanced.management.commands.authenhanced.check_email_uniqueness',
+        new=MockCheckFunctions.return_true
+    )
+    def test_unique_mail_success(self):
+        """A successful check for unique emails will print a message to stdout."""
+
+        # prepare test environment to capture stdout
+        out = StringIO()
+
+        call_command('authenhanced', 'unique-email', stdout=out)
+        self.assertIn('All email addresses are unique!', out.getvalue())
+
+    @mock.patch(
+        'auth_enhanced.management.commands.authenhanced.check_admin_notification',
+        new=MockCheckFunctions.return_true
+    )
+    def test_admin_notification_success(self):
+        """A successful check for admin notifications will print a message to
+        stdout."""
+
+        # prepare test environment to capture stdout
+        out = StringIO()
+
+        call_command('authenhanced', 'admin-notification', stdout=out)
+        self.assertIn('Notification settings are valid!', out.getvalue())
+
+    @mock.patch(
+        'auth_enhanced.management.commands.authenhanced.check_admin_notification',
+        new=MockCheckFunctions.return_true
+    )
+    @mock.patch(
+        'auth_enhanced.management.commands.authenhanced.check_email_uniqueness',
+        new=MockCheckFunctions.return_true
+    )
+    def test_full_success(self):
+        """Full check will run all seperate checks, including the different
+        outputs to stdout."""
+
+        # prepare test environment to capture stdout
+        out = StringIO()
+
+        call_command('authenhanced', 'full', stdout=out)
+        self.assertIn('All email addresses are unique!', out.getvalue())
+        self.assertIn('Notification settings are valid!', out.getvalue())
 
 
 @tag('command')

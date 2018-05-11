@@ -15,7 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 from auth_enhanced.exceptions import AuthEnhancedException
 
 
-class EnhancedCrypto(object):
+class EnhancedCrypto:
     """A single interface to all of Django's crypto features.
 
     And as a side-note: I really like how this reads: *enhanced* crypto! (;"""

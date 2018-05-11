@@ -20,8 +20,10 @@ from auth_enhanced.crypto import EnhancedCrypto
 from .utils.testcases import AuthEnhancedTestCase
 
 try:
+    # Python 3
     from unittest import mock
 except ImportError:
+    # Python 2.7
     import mock
 
 
@@ -29,7 +31,7 @@ except ImportError:
 class EnhancedCryptoTests(AuthEnhancedTestCase):
     """These tests target the EnhancedCrypto class."""
 
-    class MockSignUnsign(object):
+    class MockSignUnsign:
         """This class just provides necessary mock methods."""
 
         @staticmethod

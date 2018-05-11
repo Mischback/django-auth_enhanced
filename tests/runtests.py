@@ -37,7 +37,7 @@ def setup(disable_optimisation, enable_migrations, enable_timing, verbosity):
     configuration to actually run the app has to be specified using Django's
     setting-mechanism."""
 
-    class DisableMigrations(object):
+    class DisableMigrations:
         """A generic class to disable all migrations during tests.
 
         See setup()-function on how this is applied."""

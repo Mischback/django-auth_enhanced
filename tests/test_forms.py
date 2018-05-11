@@ -29,8 +29,10 @@ from auth_enhanced.settings import (
 from .utils.testcases import AuthEnhancedTestCase
 
 try:
+    # Python 3
     from unittest import mock
 except ImportError:
+    # Python 2.7
     import mock
 
 
@@ -38,7 +40,7 @@ except ImportError:
 class EmailVerificationFormTests(AuthEnhancedTestCase):
     """These tests target the EmailVerificationForm."""
 
-    class MockVerifyToken(object):
+    class MockVerifyToken:
         """This class just provides necessary mock methods."""
 
         @staticmethod
