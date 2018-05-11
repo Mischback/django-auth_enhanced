@@ -7,6 +7,12 @@ from django.core.management.base import CommandError
 from django.db.models import Count
 
 
+def check_admin_notification(stdout):
+    """Checks, if the respective setting contains valid accounts with verified
+    email addresses."""
+    stdout.write('[.] check_admin_notification()')
+
+
 def check_email_uniqueness(stdout):
     """This function checks, if all email addresses are unique."""
 
