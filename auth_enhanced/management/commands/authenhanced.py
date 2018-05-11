@@ -47,8 +47,8 @@ class Command(BaseCommand):
                 self.stdout.write('[ok] Notification settings are valid!')
         elif 'full' == self.cmd:
             self.stdout.write('Performing all app-specific checks!')
-            check_email_uniqueness(self.stdout)
-            check_admin_notification(self.stdout)
+            if check_email_uniqueness() and check_admin_notification():
+                self.stdout.write('[ok] All app-specific tests passed!')
         else:
             raise CommandError("No valid command was provided!")
 

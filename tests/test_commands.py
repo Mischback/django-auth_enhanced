@@ -26,6 +26,21 @@ except ImportError:
 
 
 @tag('command')
+class CheckAuthEnhancedCommand(AuthEnhancedTestCase):
+    """This tests target the parts of the command logic, that is not really
+    involved in checking."""
+
+    def test_unknown_command(self):
+        """Unknown commands raise an error."""
+
+        # prepare test environment to capture stdout
+        out = StringIO()
+
+        with self.assertRaisesMessage(CommandError, "No valid command was provided!"):
+            call_command('authenhanced', 'foo', stdout=out)
+
+
+@tag('command')
 class CheckAdminNotificationTests(AuthEnhancedTestCase):
     """These tests target the 'check_admin_notification()'-function.
 
