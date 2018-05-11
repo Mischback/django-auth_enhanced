@@ -7,11 +7,13 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import CommandError
 from django.db.models import Count
 
+# app imports
+from auth_enhanced.models import UserEnhancement
 
-def check_admin_notification(stdout):
+
+def check_admin_notification():
     """Checks, if the respective setting contains valid accounts with verified
     email addresses."""
-    stdout.write('[.] check_admin_notification()')
 
     user_model = get_user_model()
 
@@ -27,26 +29,48 @@ def check_admin_notification(stdout):
             **{'{}__in'.format(user_model.USERNAME_FIELD): username_list}
         )
         # this filter only delivers accounts with verified email addresses
-        # TODO: restart development here! How to access the related objects
-        #   additional properties?
-        .filter(user_model.enhancement.email_verification_status)
+        .filter(enhancement__email_verification_status=UserEnhancement.EMAIL_VERIFICATION_COMPLETED)
     )
-
-    # TODO: debug output, REMOVE ME!
-    print(verified_email)
 
     # determine, which accounts do have unverified email addresses
     if len(username_list) > len(verified_email):
-        unverified_email = []
-        for u in username_list:
-            if u not in verified_email:
-                unverified_email.append(u)
+        # actually build the list to raise the error message
+        unverified_email = [
+            u for u in username_list if u not in verified_email.values_list(
+                user_model.USERNAME_FIELD, flat=True
+            )
+        ]
 
+        # TODO: For the moment, this is perfectly fine. But if there are some
+        #   more, different notification methods, this might not be necessary
+        #   anymore. This check then have to take the specified 'notification-
+        #   method' into consideration. Instead of raising the CommandError,
+        #   only a warning has to be displayed.
         raise CommandError(
             "The following accounts do not have a verified email address: {}. "
             "Administrative notifications will only be sent to verfified email "
-            "addresses."
+            "addresses.".format(', '.join(unverified_email))
         )
+
+    # determine, if the specified users have sufficient permissions
+    # TODO: For the moment, only superusers are able to actually change
+    #   user-objects. If there is a custom permission system, it is possible
+    #   to actually check for more specific conditions/permissions
+    authorised_users = verified_email.filter(is_superuser=True)
+
+    if len(username_list) > len(authorised_users):
+        unauthorised_users = [
+            u for u in username_list if u not in authorised_users.values_list(
+                user_model.USERNAME_FIELD, flat=True
+            )
+        ]
+
+        raise CommandError(
+            "The following accounts do not have the sufficient permissions to "
+            "actually modify accounts: {}.".format(', '.join(unauthorised_users))
+        )
+
+    return True
 
 
 def check_email_uniqueness():

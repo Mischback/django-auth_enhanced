@@ -6,7 +6,9 @@ check certain bits of 'django-auth_ehanced'."""
 from django.core.management.base import BaseCommand, CommandError
 
 # app imports
-from auth_enhanced.management.commands._lib import check_admin_notification, check_email_uniqueness
+from auth_enhanced.management.commands._lib import (
+    check_admin_notification, check_email_uniqueness,
+)
 
 
 class Command(BaseCommand):
@@ -41,7 +43,8 @@ class Command(BaseCommand):
                 # all email addresses are unique!
                 self.stdout.write('[ok] All email addresses are unique!')
         elif 'admin-notification' == self.cmd:
-            check_admin_notification(self.stdout)
+            if check_admin_notification():
+                self.stdout.write('[ok] Notification settings are valid!')
         elif 'full' == self.cmd:
             self.stdout.write('Performing all app-specific checks!')
             check_email_uniqueness(self.stdout)
