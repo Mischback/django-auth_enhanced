@@ -13,7 +13,7 @@ def check_admin_notification(stdout):
     stdout.write('[.] check_admin_notification()')
 
 
-def check_email_uniqueness(stdout):
+def check_email_uniqueness():
     """This function checks, if all email addresses are unique."""
 
     user_model = get_user_model()
@@ -30,11 +30,7 @@ def check_email_uniqueness(stdout):
         .values(user_model.EMAIL_FIELD)
     )
 
-    if not non_unique_emails:
-        # all email addresses are unique!
-        stdout.write('[ok] All email addresses are unique!')
-    else:
-
+    if non_unique_emails:
         # get the usernames of accounts, that have non-unique email addresses
         non_unique_accounts = (
             user_model.objects.filter(
@@ -53,3 +49,5 @@ def check_email_uniqueness(stdout):
                 ', '.join(non_unique_accounts)
             )
         )
+
+    return True

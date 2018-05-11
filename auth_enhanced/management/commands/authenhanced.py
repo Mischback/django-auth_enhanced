@@ -37,7 +37,9 @@ class Command(BaseCommand):
         self.cmd = options['cmd'][0]
 
         if 'unique-email' == self.cmd:
-            check_email_uniqueness(self.stdout)
+            if check_email_uniqueness():
+                # all email addresses are unique!
+                self.stdout.write('[ok] All email addresses are unique!')
         elif 'admin-notification' == self.cmd:
             check_admin_notification(self.stdout)
         elif 'full' == self.cmd:
