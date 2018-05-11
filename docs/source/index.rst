@@ -48,6 +48,7 @@ Contents
     :maxdepth: 2
 
     settings
+    admin_command
 
 
 Indices and tables

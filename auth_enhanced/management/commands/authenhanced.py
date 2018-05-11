@@ -49,8 +49,24 @@ def check_admin_notification():
         #   only a warning has to be displayed.
         raise CommandError(
             "The following accounts do not have a verified email address: {}. "
-            "Administrative notifications will only be sent to verfified email "
+            "Administrative notifications will only be sent to verified email "
             "addresses.".format(', '.join(unverified_email))
+        )
+
+    # check, if the verified email addresses are in fact the ones specified in
+    #   the respective setting
+    not_matching_email = [
+        u[0] for u in settings.DAE_ADMIN_SIGNUP_NOTIFICATION if u[1] not in verified_email.values_list(
+            user_model.EMAIL_FIELD, flat=True
+        )
+    ]
+
+    if not_matching_email:
+        raise CommandError(
+            "The following accounts do not match the project's settings: {}. "
+            "The specified email addresses are not the ones associated with "
+            "the account. Administrative notifications will only be sent to "
+            "registered email addresses.".format(', '.join(not_matching_email))
         )
 
     # determine, if the specified users have sufficient permissions
