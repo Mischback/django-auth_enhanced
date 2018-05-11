@@ -14,7 +14,9 @@ from django.core.management import CommandError, call_command
 from django.test import override_settings, tag  # noqa
 
 # app imports
-from auth_enhanced.models import UserEnhancement
+from auth_enhanced.management.commands.authenhanced import (
+    check_admin_notification, check_email_uniqueness,
+)
 
 # app imports
 from .utils.testcases import AuthEnhancedTestCase
@@ -44,80 +46,27 @@ class CheckAuthEnhancedCommand(AuthEnhancedTestCase):
 class CheckAdminNotificationTests(AuthEnhancedTestCase):
     """These tests target the 'check_admin_notification()'-function.
 
-    See auth_enhanced/management/commands/_lib.py
+    See auth_enhanced/management/commands/_lib.py"""
 
-    FIXME: Get rid of the setUp()-method and include the stuff into a fixture."""
+    fixtures = ['tests/utils/fixtures/test_different_users.json']
 
-    def setUp(self):
-
-        # prepare test environment to capture stdout
-        self.out = StringIO()
-
-        user_model = get_user_model()
-
-        # two fully valid superusers
-        u = user_model.objects.create_superuser(**{
-            user_model.USERNAME_FIELD: 'django',
-            user_model.EMAIL_FIELD: 'django@localhost',
-            'password': 'foo'
-        })
-        UserEnhancement.objects.create(
-            user=u,
-            email_verification_status=UserEnhancement.EMAIL_VERIFICATION_COMPLETED
-        )
-        v = user_model.objects.create_superuser(**{
-            user_model.USERNAME_FIELD: 'foo',
-            user_model.EMAIL_FIELD: 'foo@localhost',
-            'password': 'foo'
-        })
-        UserEnhancement.objects.create(
-            user=v,
-            email_verification_status=UserEnhancement.EMAIL_VERIFICATION_COMPLETED
-        )
-
-        # superuser without verified email address
-        w = user_model.objects.create_superuser(**{
-            user_model.USERNAME_FIELD: 'bar',
-            user_model.EMAIL_FIELD: 'bar@localhost',
-            'password': 'foo'
-        })
-        UserEnhancement.objects.create(
-            user=w,
-            email_verification_status=UserEnhancement.EMAIL_VERIFICATION_FAILED
-        )
-
-        # a non-superuser
-        x = user_model.objects.create_user(**{
-            user_model.USERNAME_FIELD: 'baz',
-            user_model.EMAIL_FIELD: 'baz@localhost',
-            'password': 'foo'
-        })
-        UserEnhancement.objects.create(
-            user=x,
-            email_verification_status=UserEnhancement.EMAIL_VERIFICATION_COMPLETED
-        )
-
-    @override_settings(
-        DAE_ADMIN_SIGNUP_NOTIFICATION=(
-            ('django', 'django@localhost', ('mail', )),
-            ('foo', 'foo@localhost', ('mail', )),
-        )
-    )
+    @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=(
+        ('django', 'django@localhost', ('mail', )),
+        ('foo', 'foo@localhost', ('mail', )),
+    ))
     def test_all_valid(self):
-        """Should print a success message to stdout."""
+        """Returns True, if the setting is completely valid."""
 
-        call_command('authenhanced', 'admin-notification', stdout=self.out)
-        self.assertIn('[ok] Notification settings are valid!', self.out.getvalue())
+        self.assertTrue(check_admin_notification())
 
-    @override_settings(
-        DAE_ADMIN_SIGNUP_NOTIFICATION=(
-            ('django', 'django@localhost', ('mail', )),
-            ('foo', 'foo@localhost', ('mail', )),
-            ('bar', 'bar@localhost', ('mail', )),
-        )
-    )
+    @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=(
+        ('django', 'django@localhost', ('mail', )),
+        ('foo', 'foo@localhost', ('mail', )),
+        ('bar', 'bar@localhost', ('mail', )),
+    ))
     def test_address_unverified(self):
-        """One of the accounts has an unverified email address."""
+        """Raises an exception, if one of the accounts has an unverified email
+        address."""
 
         with self.assertRaisesMessage(
             CommandError,
@@ -125,24 +74,23 @@ class CheckAdminNotificationTests(AuthEnhancedTestCase):
             "Administrative notifications will only be sent to verfified email "
             "addresses."
         ):
-            call_command('authenhanced', 'admin-notification', stdout=self.out)
+            check_admin_notification()
 
-    @override_settings(
-        DAE_ADMIN_SIGNUP_NOTIFICATION=(
-            ('django', 'django@localhost', ('mail', )),
-            ('foo', 'foo@localhost', ('mail', )),
-            ('baz', 'baz@localhost', ('mail', )),
-        )
-    )
+    @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=(
+        ('django', 'django@localhost', ('mail', )),
+        ('foo', 'foo@localhost', ('mail', )),
+        ('baz', 'baz@localhost', ('mail', )),
+    ))
     def test_insufficient_permissions(self):
-        """One of the accounts does not have sufficient permissions."""
+        """Raises an exception, if one of the accounts does not have sufficient
+        permissions."""
 
         with self.assertRaisesMessage(
             CommandError,
             "The following accounts do not have the sufficient permissions to "
             "actually modify accounts: baz."
         ):
-            call_command('authenhanced', 'admin-notification', stdout=self.out)
+            check_admin_notification()
 
 
 @tag('command')
@@ -152,10 +100,7 @@ class CheckEmailUniquenessTests(AuthEnhancedTestCase):
     See auth_enhanced/management/commands/_lib.py"""
 
     def test_all_addresses_unique(self):
-        """Should print a success message to stdout."""
-
-        # prepare test environment to capture stdout
-        out = StringIO()
+        """Returns True, if all email addresses are unique."""
 
         user_model = get_user_model()
 
@@ -169,14 +114,10 @@ class CheckEmailUniquenessTests(AuthEnhancedTestCase):
             user_model.EMAIL_FIELD: 'foo@localhost'     # noqa
         })                                              # noqa
 
-        call_command('authenhanced', 'unique-email', stdout=out)
-        self.assertIn('[ok] All email addresses are unique!', out.getvalue())
+        self.assertTrue(check_email_uniqueness())
 
     def test_addresses_not_unique(self):
-        """Should print a success message to stdout."""
-
-        # prepare test environment to capture stdout
-        out = StringIO()
+        """Raises an exception, if the email addresses are not unique."""
 
         user_model = get_user_model()
 
@@ -194,4 +135,4 @@ class CheckEmailUniquenessTests(AuthEnhancedTestCase):
             CommandError,
             "The following accounts don't have unique email addresses: django, foo"
         ):
-            call_command('authenhanced', 'unique-email', stdout=out)
+            check_email_uniqueness()
