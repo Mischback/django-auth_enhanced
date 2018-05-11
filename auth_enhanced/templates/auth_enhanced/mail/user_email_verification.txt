@@ -1,0 +1,32 @@
+{% load admin_urls %}
+*** django-auth_enhanced ***
+------------------------------
+
+Hello {{ new_user.username }}!
+
+You just completed the the signup process at *django-auth_enhanced*. To activate your account and enable login, you have to verify your email address.
+
+Please visit the following link and enter your verification token:
+    >> http://deb9:8080{% url 'auth_enhanced:email-verification' %}
+    >> Token: {{ verification_token }}
+
+Alternatively you can visit the following link to directly activate your account:
+    >> http://deb9:8080{% url 'auth_enhanced:email-verification' verification_token %}
+
+
+
+** Notice
+------------------------------
+
+This is an automatically generated email. If you received this mail accidentally, please contact the administrator ({{ webmaster_email }}) and inform him about it. Or just ignore this mail and delete it!
+
+
+
+** Contact
+------------------------------
+
+- visit the website:
+    >> http://deb9:8080
+
+- contact the administrator by mail:
+    >> {{ webmaster_email }}

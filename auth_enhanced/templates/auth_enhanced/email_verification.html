@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Email Verification{% endblock %}
+{% block 'content' %}
+<div class="element">
+  <form method="post" action="{% url 'auth_enhanced:email-verification' %}">
+    <h1 class="atom align-right">Email Verification</h1>
+
+    {% if form.non_field_errors %}
+    <div class="atom box error-box">
+      <h2>Error!</h2>
+      {% for error in form.non_field_errors %}
+      <p>
+        {{ error }}
+      </p>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% for field in form.visible_fields %}
+      {% if field.errors %}
+    <div class="atom box error-box">
+      <h2>Error!</h2>
+        {% for error in field.errors %}
+        <p>
+          {{ error }}
+        </p>
+        {% endfor %}
+    </div>
+      {% endif %}
+    {% endfor %}
+
+    <div class="atom">
+      <label for="id_token">Email Verification Token</label>
+      <input id="id_token" name="token" placeholder="Verification Token" autofocus required type="text" class="form-atom">
+    </div>
+
+    <div class="atom">
+      <button type="submit" class="form-atom">Verify</button>
+    </div>
+    {% csrf_token %}
+  </form>
+</div>
+{% endblock 'content' %}

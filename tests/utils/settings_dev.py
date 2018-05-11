@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""django-auth_enhanced: Development/test settings.
-
-This file contains minimum settings to run the development inside of
+"""Contains minimum settings to run the development inside of
 tox-environments and run the tests.
 
 Please note, that some settings are explicitly set by the testrunner (see
@@ -54,7 +52,7 @@ MIDDLEWARE = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': TEST_ROOT,
+        'DIRS': [join(TEST_ROOT, 'utils', 'templates'), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -77,3 +75,20 @@ STATIC_URL = '/static/'
 # this is a minimum test requirement
 SECRET_KEY = 'only-for-testing'
 
+# adjust Django's default setting to this app's login view
+#   Django's default: '/accounts/login/'
+LOGIN_URL = 'auth_enhanced:login'
+
+# if there is no special next parameter after login, show this page
+#   Django's default: '/accounts/profile/'
+LOGIN_REDIRECT_URL = '/'
+
+# just for development. Doesn't work for tests (locmem?)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+### CURRENT DEVELOPMENT
+DAE_ADMIN_SIGNUP_NOTIFICATION = (
+    ('django', 'django@localhost', ('mail', )),
+)
+
+DAE_OPERATION_MODE = 'email-verification'

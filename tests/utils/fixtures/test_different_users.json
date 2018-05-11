@@ -1,0 +1,106 @@
+[
+{
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$100000$cmT7Sn6F8MDR$roOaI7UWMsBft3jCnE03mA/WONqVVNjR8HqJCPK+Ts8=",
+        "last_login": "2018-05-11T15:11:42.378",
+        "is_superuser": true,
+        "username": "django",
+        "first_name": "",
+        "last_name": "",
+        "email": "django@localhost",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2018-05-11T15:09:47.750",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$100000$O281wr64DfOP$D9kqIbQbkf7t0e/QFgtoFVDB4eovVodIFBjsflCvdgA=",
+        "last_login": null,
+        "is_superuser": true,
+        "username": "foo",
+        "first_name": "",
+        "last_name": "",
+        "email": "foo@localhost",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2018-05-11T15:10:18.134",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+        "password": "pbkdf2_sha256$100000$Y9EhOQADMfqI$XyehmEjtq2CRmZlzDCTZmT4M9g9nrvXC4vAEXqqmEjQ=",
+        "last_login": null,
+        "is_superuser": true,
+        "username": "bar",
+        "first_name": "",
+        "last_name": "",
+        "email": "bar@localhost",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2018-05-11T15:10:58.126",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "auth.user",
+    "pk": 4,
+    "fields": {
+        "password": "pbkdf2_sha256$100000$lV52crpDsEzY$ayhyunUhctRHY2JcTiOnGZqT72VzfVk9uqLNdRmKKaA=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "baz",
+        "first_name": "",
+        "last_name": "",
+        "email": "baz@localhost",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2018-05-11T15:12:20",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "auth_enhanced.userenhancement",
+    "pk": 1,
+    "fields": {
+        "email_verification_status": "EMAIL_VERIFICATION_COMPLETED",
+        "user": 1
+    }
+},
+{
+    "model": "auth_enhanced.userenhancement",
+    "pk": 2,
+    "fields": {
+        "email_verification_status": "EMAIL_VERIFICATION_COMPLETED",
+        "user": 2
+    }
+},
+{
+    "model": "auth_enhanced.userenhancement",
+    "pk": 3,
+    "fields": {
+        "email_verification_status": "EMAIL_VERIFICATION_FAILED",
+        "user": 3
+    }
+},
+{
+    "model": "auth_enhanced.userenhancement",
+    "pk": 4,
+    "fields": {
+        "email_verification_status": "EMAIL_VERIFICATION_COMPLETED",
+        "user": 4
+    }
+}
+]

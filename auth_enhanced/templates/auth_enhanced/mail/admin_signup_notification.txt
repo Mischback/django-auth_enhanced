@@ -1,0 +1,44 @@
+{% load admin_urls %}
+*** django-auth_enhanced ***
+------------------------------
+
+Hello {{ admin_name }}!
+
+The user '{{ new_user.username }}' just signed up at *django-auth_enhanced*!
+{% if mode_email %}An activation mail was sent to verify his email address and he will get activated automatically, if his address is confirmed.{% endif %}
+{% if mode_manual %}Accounts are created as inactive and have to be activated manually. You have the necessary permissions to do just that.{% endif %}
+
+If you want to review the user '{{ new_user.username }}', please visit:
+>> http://deb9:8080{% url user_model|admin_urlname:'change' new_user.pk %}
+
+Please be aware that this mail may be send to other staff members aswell.
+
+
+
+** About this mail
+------------------------------
+
+You received this mail because you are a staff member of *django-auth_enhanced* and you will receive notifications about all newly registered accounts.
+{% if mode_auto %}*django-auth_enhanced* uses a signup system that activates users automatically. Thus, this mail is just for your information. You do not need to do anything about it.{% endif %}
+{% if mode_email %}*django-auth_enhanced* uses a signup system that requires new users to verify their email address before they get activated automatically. Thus, this mail is just for your information. You do not need to do anything about it.{% endif %}
+{% if mode_manual %}*django-auth_enhanced* uses a signup system that requires the manual activation of accounts by a staff member. The newly registered user will not be able to use the website without activation.{% endif %}
+
+If you do not want to receive further signup notifications, please contact the administrator ({{ webmaster_email }}) and ask him to change the configuration.
+
+
+
+** Notice
+------------------------------
+
+This is an automatically generated email. If you received this mail accidentally, please contact the administrator ({{ webmaster_email }}) and inform him about it.
+
+
+
+** Contact
+------------------------------
+
+- visit the website:
+    >> http://deb9:8080
+
+- contact the administrator by mail:
+    >> {{ webmaster_email }}
