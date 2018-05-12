@@ -87,8 +87,3 @@ LOGIN_REDIRECT_URL = '/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ### CURRENT DEVELOPMENT
-DAE_ADMIN_SIGNUP_NOTIFICATION = (
-    ('django', 'django@localhost', ('mail', )),
-)
-
-DAE_OPERATION_MODE = 'email-verification'

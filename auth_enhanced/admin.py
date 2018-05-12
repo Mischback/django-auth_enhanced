@@ -38,7 +38,19 @@ class EnhancedUserAdmin(UserAdmin):
     It is designed to enhance and substitute the default admin interface
     provided by 'django.contrib.auth'. But furthermore, it should be as
     pluggable as possible, to be able to deal with custom user models."""
-    pass
+
+    # 'list_display' controls, which fields will be displayed in the list view.
+    # This is configurable with an app-specific setting or will be left at
+    # Django's default value:
+    #   ('username', 'email', 'first_name', 'last_name', 'is_staff')
+    # TODO: Django already checks the value of 'list_display', so it might be
+    #   unnecessary to actually check DAE_ADMIN_LIST_DISPLAY within the app.
+    #   However, it should be ensured, that the app's setting only includes
+    #   valid values, which depends on the AUTH_USER_MODEL in use.
+    try:
+        list_display = settings.DAE_ADMIN_LIST_DISPLAY
+    except AttributeError:
+        pass
 
 
 @register_only_debug(UserEnhancement)
@@ -52,6 +64,7 @@ class UserEnhancementAdmin(ModelAdmin):
     pass
 
 
-#
+# substitute the default implementation of the user admin
+# TODO: should this be configurable?
 site.unregister(get_user_model())
 site.register(get_user_model(), EnhancedUserAdmin)
