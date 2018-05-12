@@ -31,6 +31,9 @@ Available Settings
         * ``False`` (default value): No notification will be sent.
         * a tuple of the following structure: ``('django', 'django@localhost', ('mail', )),``, where ``'django'`` is a username, ``'django@localhost'`` a valid email address and ``('mail', )`` a tuple of notification methods. As of now, only ``'mail'`` is supported.
 
+    DAE_ADMIN_USERNAME_STATUS_COLOR
+        TODO: document this setting!
+
     DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX
         All emails to admins / superusers will have a subject, that is prefixed
         with this string, put in ``[]``, i.e. if this setting is set to ``'foo'``,

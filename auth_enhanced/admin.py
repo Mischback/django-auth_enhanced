@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
 # app imports
@@ -123,20 +124,43 @@ class EnhancedUserAdmin(UserAdmin):
 
         return actions
 
-    def status_aggregated(self, obj):
+    def status_aggregated(self, user_obj):
         """Returns the status of an user as string.
 
         Possible values: 'user', 'staff', 'superuser'; these strings will be
         localized."""
 
         status = _('user')
-        if obj.is_superuser:
+        if user_obj.is_superuser:
             status = _('superuser')
-        elif obj.is_staff:
+        elif user_obj.is_staff:
             status = _('staff')
 
         return status
     status_aggregated.short_description = _('Status')
+
+    def username_status_color(self, user_obj):
+        """Returns a colored username, according to its status."""
+
+        try:
+            color = settings.DAE_ADMIN_USERNAME_STATUS_COLOR
+        except AttributeError:
+            return getattr(user_obj, user_obj.USERNAME_FIELD)
+
+        if user_obj.is_superuser:
+            obj_color = color[0]
+        elif user_obj.is_staff:
+            obj_color = color[1]
+        else:
+            return getattr(user_obj, user_obj.USERNAME_FIELD)
+
+        return format_html(
+            '<span style="color: {};">{}</span>',
+            obj_color,
+            getattr(user_obj, user_obj.USERNAME_FIELD)
+        )
+    username_status_color.short_description = _('Username (status)')
+    username_status_color.admin_order_field = '-username'
 
 
 @register_only_debug(UserEnhancement)

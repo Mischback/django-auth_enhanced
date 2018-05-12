@@ -14,7 +14,7 @@ from django.test import override_settings, tag  # noqa
 
 # app imports
 from auth_enhanced.checks import (
-    E001, E002, E003, E004, E008, E009, E010, E011, W005, W006, W007,
+    E001, E002, E003, E004, E008, E009, E010, E011, E012, W005, W006, W007,
     check_settings_values,
 )
 from auth_enhanced.settings import (
@@ -182,8 +182,30 @@ class CheckSettingsValuesTests(AuthEnhancedTestCase):
 
     @override_settings(DAE_ADMIN_SHOW_SEARCHBOX='foo')
     def test_e011_invalid(self):
-        """Invalid values show an error message.
-
-        Actually, 'None' is the only way to raise this error."""
+        """Invalid values show an error message."""
         errors = check_settings_values(None)
         self.assertEqual(errors, [E011])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=('#0f0f0f', '#f0f0f0'))
+    def test_e012_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR='foo')
+    def test_e012_invalid_no_tuple(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E012])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=('foo', 'bar', 'baz'))
+    def test_e012_invalid_invalid_number_of_parameters(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E012])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=('foo', 'bar'))
+    def test_e012_invalid_no_color_codes(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E012])

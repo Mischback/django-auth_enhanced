@@ -9,6 +9,9 @@ There are two different types of checks:
 2) checks, that the logical connection between different settings is valid"""
 
 
+# Python imports
+import re
+
 # Django imports
 from django.conf import settings
 from django.core.checks import Error, Warning
@@ -146,6 +149,17 @@ E011 = Error(
     id='dae.e011'
 )
 
+# DAE_ADMIN_USERNAME_STATUS_COLOR
+E012 = Error(
+    _("'DAE_ADMIN_USERNAME_STATUS_COLOR' is set to an invalid value!"),
+    hint=_(
+        "Please check your settings and ensure, that "
+        "'DAE_ADMIN_USERNAME_STATUS_COLOR' is set to a tuple containing two "
+        "valid hexadecimal color codes ('#rrggbb')."
+    ),
+    id='dae.e012'
+)
+
 
 def check_settings_values(app_configs, **kwargs):
     """Checks, if the app-specific settings have valid values."""
@@ -235,6 +249,21 @@ def check_settings_values(app_configs, **kwargs):
     # DAE_ADMIN_SHOW_SEARCHBOX
     if not isinstance(settings.DAE_ADMIN_SHOW_SEARCHBOX, bool):
         errors.append(E011)
+
+    # DAE_ADMIN_USERNAME_STATUS_COLOR
+    try:
+        if not isinstance(settings.DAE_ADMIN_USERNAME_STATUS_COLOR, tuple):
+            errors.append(E012)
+        elif len(settings.DAE_ADMIN_USERNAME_STATUS_COLOR) != 2:
+            errors.append(E012)
+        else:
+            if (
+                not re.match('^#[0-9A-Fa-f]{6}$', settings.DAE_ADMIN_USERNAME_STATUS_COLOR[0]) or
+                not re.match('^#[0-9A-Fa-f]{6}$', settings.DAE_ADMIN_USERNAME_STATUS_COLOR[1])
+            ):
+                errors.append(E012)
+    except AttributeError:
+        pass
 
     # and now hope, this is still empty! ;)
     return errors

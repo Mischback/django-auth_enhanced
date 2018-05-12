@@ -8,6 +8,7 @@
 from unittest import skip  # noqa
 
 # Django imports
+from django.conf import settings
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.test import override_settings, tag  # noqa
@@ -62,7 +63,7 @@ class EnhancedUserStatusFilterTest(AuthEnhancedTestCase):
         self.assertEqual(len(f_result), 6)
 
 
-@tag('admin', 'current')
+@tag('admin')
 class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
     """These tests target the admin class and require some user objects."""
 
@@ -94,3 +95,53 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
 
         u = get_user_model().objects.get(username='django')
         self.assertEqual(self.admin_obj.status_aggregated(u), 'superuser')
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=None)
+    def test_username_status_color_missing_setting(self):
+        """Just returns the username, if no colors are specified."""
+
+        # actually delete the setting
+        #   Please note, how the setting is first overridden and then deleted.
+        #   This is done to ensure, that this works independently from the
+        #   test settings.
+        del settings.DAE_ADMIN_USERNAME_STATUS_COLOR
+
+        u = get_user_model().objects.get(username='django')
+        self.assertEqual(
+            self.admin_obj.username_status_color(u), getattr(u, u.USERNAME_FIELD)
+        )
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=('#0f0f0f', '#f0f0f0'))
+    def test_username_status_color_user(self):
+        """Just returns the username, if it is a normal user."""
+
+        u = get_user_model().objects.get(username='baz')
+        self.assertEqual(
+            self.admin_obj.username_status_color(u), getattr(u, u.USERNAME_FIELD)
+        )
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=('#0f0f0f', '#f0f0f0'))
+    def test_username_status_color_staff(self):
+        """Applies a color to the username, if staff status."""
+
+        u = get_user_model().objects.get(username='staff_user1')
+        self.assertEqual(
+            self.admin_obj.username_status_color(u),
+            '<span style="color: {};">{}</span>'.format(
+                '#f0f0f0',
+                getattr(u, u.USERNAME_FIELD)
+            )
+        )
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=('#0f0f0f', '#f0f0f0'))
+    def test_username_status_color_superuser(self):
+        """Applies a color to the username, if superuser status."""
+
+        u = get_user_model().objects.get(username='django')
+        self.assertEqual(
+            self.admin_obj.username_status_color(u),
+            '<span style="color: {};">{}</span>'.format(
+                '#0f0f0f',
+                getattr(u, u.USERNAME_FIELD)
+            )
+        )
