@@ -136,6 +136,16 @@ E010 = Error(
     id='dae.e010'
 )
 
+# DAE_ADMIN_SHOW_SEARCHBOX
+E011 = Error(
+    _("'DAE_ADMIN_SHOW_SEARCHBOX' has to be a boolean value!"),
+    hint=_(
+        "Please check your settings and ensure that "
+        "'DAE_ADMIN_SHOW_SEARCHBOX' is either True or False."
+    ),
+    id='dae.e011'
+)
+
 
 def check_settings_values(app_configs, **kwargs):
     """Checks, if the app-specific settings have valid values."""
@@ -221,6 +231,10 @@ def check_settings_values(app_configs, **kwargs):
     # DAE_VERIFICATION_TOKEN_MAX_AGE
     if not isinstance(settings.DAE_VERIFICATION_TOKEN_MAX_AGE, six.integer_types):
         errors.append(E010)
+
+    # DAE_ADMIN_SHOW_SEARCHBOX
+    if not isinstance(settings.DAE_ADMIN_SHOW_SEARCHBOX, bool):
+        errors.append(E011)
 
     # and now hope, this is still empty! ;)
     return errors
