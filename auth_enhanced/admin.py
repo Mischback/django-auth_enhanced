@@ -3,9 +3,10 @@
 
 # Django imports
 from django.conf import settings
-from django.contrib.admin import ModelAdmin, register, site
+from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
+from django.utils.translation import ugettext_lazy as _
 
 # app imports
 from auth_enhanced.models import UserEnhancement
@@ -26,10 +27,46 @@ def register_only_debug(*models, **kwargs):
 
     if settings.DEBUG:
         # re-use Django's register-decorator
-        return register(*models, **kwargs)
+        return admin.register(*models, **kwargs)
 
     # return a noop
     return _wrapper_noop
+
+
+class EnhancedUserStatusFilter(admin.SimpleListFilter):
+    """Custom SimpleListFilter to filter on user's status"""
+
+    # the title of this filter
+    title = _('status')
+
+    # the parameter in the URL
+    parameter_name = 'status'
+
+    def lookups(self, request, model_admin):
+        """Controls the options in the filter list.
+
+        First value in the tuple: parameter in the query string
+        Second value: The caption for the filter list"""
+
+        return (
+            ('users', _('Users')),
+            ('staff', _('Staff')),
+            ('superusers', _('Superusers'))
+        )   # pragma nocover
+
+    def queryset(self, request, queryset):
+        """This actually modifies the queryset, if the filter is applied."""
+
+        if self.value() == 'users':
+            return queryset.filter(is_staff=False).filter(is_superuser=False)
+
+        if self.value() == 'staff':
+            return queryset.filter(is_staff=True)
+
+        if self.value() == 'superusers':
+            return queryset.filter(is_superuser=True)
+
+        return queryset
 
 
 class EnhancedUserAdmin(UserAdmin):
@@ -52,9 +89,14 @@ class EnhancedUserAdmin(UserAdmin):
     except AttributeError:
         pass
 
+    # 'list_filter' controls, which filters will be usable in the list view.
+    # Django's default admin class provides the following list:
+    #   ('is_staff', 'is_superuser', 'is_active', 'groups')
+    list_filter = (EnhancedUserStatusFilter, 'is_active', 'groups')
+
 
 @register_only_debug(UserEnhancement)
-class UserEnhancementAdmin(ModelAdmin):
+class UserEnhancementAdmin(admin.ModelAdmin):
     """Integrates UserEnhancement into Django's admin menu.
 
     This ModelAdmin is just used for development and should not be registered
@@ -66,5 +108,5 @@ class UserEnhancementAdmin(ModelAdmin):
 
 # substitute the default implementation of the user admin
 # TODO: should this be configurable?
-site.unregister(get_user_model())
-site.register(get_user_model(), EnhancedUserAdmin)
+admin.site.unregister(get_user_model())
+admin.site.register(get_user_model(), EnhancedUserAdmin)
