@@ -3,7 +3,9 @@
 
 # Django imports
 from django.conf import settings
-from django.contrib.admin import ModelAdmin, register
+from django.contrib.admin import ModelAdmin, register, site
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
 
 # app imports
 from auth_enhanced.models import UserEnhancement
@@ -30,6 +32,15 @@ def register_only_debug(*models, **kwargs):
     return _wrapper_noop
 
 
+class EnhancedUserAdmin(UserAdmin):
+    """This class substitutes the default admin interface for user objects.
+
+    It is designed to enhance and substitute the default admin interface
+    provided by 'django.contrib.auth'. But furthermore, it should be as
+    pluggable as possible, to be able to deal with custom user models."""
+    pass
+
+
 @register_only_debug(UserEnhancement)
 class UserEnhancementAdmin(ModelAdmin):
     """Integrates UserEnhancement into Django's admin menu.
@@ -39,3 +50,8 @@ class UserEnhancementAdmin(ModelAdmin):
     UserEnhancements will be integrated into the respective admin class for
     the User-objects."""
     pass
+
+
+#
+site.unregister(get_user_model())
+site.register(get_user_model(), EnhancedUserAdmin)
