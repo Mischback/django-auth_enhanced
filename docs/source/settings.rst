@@ -17,6 +17,12 @@ Available Settings
 
 .. glossary::
 
+    DAE_ADMIN_LIST_DISPLAY
+        TODO: document this setting!
+
+    DAE_ADMIN_SHOW_SEARCHBOX
+        TODO: document this setting!
+
     DAE_ADMIN_SIGNUP_NOTIFICATION
         Controls, if admins / superusers will be notified of new signups.
 

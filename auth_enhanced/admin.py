@@ -110,6 +110,19 @@ class EnhancedUserAdmin(UserAdmin):
     # Django's default value is just 'username'
     ordering = ('-is_superuser', '-is_staff', 'is_active', 'username')
 
+    def get_actions(self, request):
+        """Extends the default 'get_actions()'-method to exclude the bulk
+        action 'delete objects' from the dropdown."""
+
+        # get the original list of actions
+        actions = super(EnhancedUserAdmin, self).get_actions(request)
+
+        # remove the action from the dropdown
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+
+        return actions
+
 
 @register_only_debug(UserEnhancement)
 class UserEnhancementAdmin(admin.ModelAdmin):
