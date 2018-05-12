@@ -123,6 +123,21 @@ class EnhancedUserAdmin(UserAdmin):
 
         return actions
 
+    def status_aggregated(self, obj):
+        """Returns the status of an user as string.
+
+        Possible values: 'user', 'staff', 'superuser'; these strings will be
+        localized."""
+
+        status = _('user')
+        if obj.is_superuser:
+            status = _('superuser')
+        elif obj.is_staff:
+            status = _('staff')
+
+        return status
+    status_aggregated.short_description = _('Status')
+
 
 @register_only_debug(UserEnhancement)
 class UserEnhancementAdmin(admin.ModelAdmin):
