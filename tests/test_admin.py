@@ -145,3 +145,47 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
                 getattr(u, u.USERNAME_FIELD)
             )
         )
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=None)
+    def test_username_status_char_missing_setting(self):
+        """Just returns the username, if no colors are specified."""
+
+        # actually delete the setting
+        #   Please note, how the setting is first overridden and then deleted.
+        #   This is done to ensure, that this works independently from the
+        #   test settings.
+        del settings.DAE_ADMIN_USERNAME_STATUS_CHAR
+
+        u = get_user_model().objects.get(username='django')
+        self.assertEqual(
+            self.admin_obj.username_status_char(u), getattr(u, u.USERNAME_FIELD)
+        )
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=('a', 'b'))
+    def test_username_status_char_user(self):
+        """Just returns the username, if it is a normal user."""
+
+        u = get_user_model().objects.get(username='baz')
+        self.assertEqual(
+            self.admin_obj.username_status_char(u), getattr(u, u.USERNAME_FIELD)
+        )
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=('a', 'b'))
+    def test_username_status_char_staff(self):
+        """Applies a color to the username, if staff status."""
+
+        u = get_user_model().objects.get(username='staff_user1')
+        self.assertEqual(
+            self.admin_obj.username_status_char(u),
+            '[{}] {}'.format('b', getattr(u, u.USERNAME_FIELD))
+        )
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=('a', 'b'))
+    def test_username_status_char_superuser(self):
+        """Applies a color to the username, if superuser status."""
+
+        u = get_user_model().objects.get(username='django')
+        self.assertEqual(
+            self.admin_obj.username_status_char(u),
+            '[{}] {}'.format('a', getattr(u, u.USERNAME_FIELD))
+        )

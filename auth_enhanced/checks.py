@@ -160,6 +160,17 @@ E012 = Error(
     id='dae.e012'
 )
 
+# DAE_ADMIN_USERNAME_STATUS_CHAR
+E013 = Error(
+    _("'DAE_ADMIN_USERNAME_STATUS_CHAR' is set to an invalid value!"),
+    hint=_(
+        "Please check your settings and ensure, that "
+        "'DAE_ADMIN_USERNAME_STATUS_CHAR' is set to a tuple containing two "
+        "single characters."
+    ),
+    id='dae.e013'
+)
+
 
 def check_settings_values(app_configs, **kwargs):
     """Checks, if the app-specific settings have valid values."""
@@ -262,6 +273,21 @@ def check_settings_values(app_configs, **kwargs):
                 not re.match('^#[0-9A-Fa-f]{6}$', settings.DAE_ADMIN_USERNAME_STATUS_COLOR[1])
             ):
                 errors.append(E012)
+    except AttributeError:
+        pass
+
+    # DAE_ADMIN_USERNAME_STATUS_CHAR
+    try:
+        if not isinstance(settings.DAE_ADMIN_USERNAME_STATUS_CHAR, tuple):
+            errors.append(E013)
+        elif len(settings.DAE_ADMIN_USERNAME_STATUS_CHAR) != 2:
+            errors.append(E013)
+        else:
+            if (
+                not re.match('^\S{1}$', settings.DAE_ADMIN_USERNAME_STATUS_CHAR[0]) or
+                not re.match('^\S{1}$', settings.DAE_ADMIN_USERNAME_STATUS_CHAR[1])
+            ):
+                errors.append(E013)
     except AttributeError:
         pass
 

@@ -139,6 +139,25 @@ class EnhancedUserAdmin(UserAdmin):
         return status
     status_aggregated.short_description = _('Status')
 
+    def username_status_char(self, user_obj):
+        """Returns the username with a prefix, according to its status."""
+
+        try:
+            char = settings.DAE_ADMIN_USERNAME_STATUS_CHAR
+        except AttributeError:
+            return getattr(user_obj, user_obj.USERNAME_FIELD)
+
+        if user_obj.is_superuser:
+            obj_char = char[0]
+        elif user_obj.is_staff:
+            obj_char = char[1]
+        else:
+            return getattr(user_obj, user_obj.USERNAME_FIELD)
+
+        return format_html('[{}] {}', obj_char, getattr(user_obj, user_obj.USERNAME_FIELD))
+    username_status_char.short_description = _('Username (status)')
+    username_status_char.admin_order_field = '-username'
+
     def username_status_color(self, user_obj):
         """Returns a colored username, according to its status."""
 

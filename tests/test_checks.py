@@ -14,8 +14,8 @@ from django.test import override_settings, tag  # noqa
 
 # app imports
 from auth_enhanced.checks import (
-    E001, E002, E003, E004, E008, E009, E010, E011, E012, W005, W006, W007,
-    check_settings_values,
+    E001, E002, E003, E004, E008, E009, E010, E011, E012, E013, W005, W006,
+    W007, check_settings_values,
 )
 from auth_enhanced.settings import (
     DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_RECOMMENDED_LOGIN_URL,
@@ -209,3 +209,27 @@ class CheckSettingsValuesTests(AuthEnhancedTestCase):
         """Invalid values show an error message."""
         errors = check_settings_values(None)
         self.assertEqual(errors, [E012])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=('#', '$'))
+    def test_e013_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR='foo')
+    def test_e013_invalid_no_tuple(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E013])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=('#', '$', '!'))
+    def test_e013_invalid_invalid_number_of_parameters(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E013])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=('foo', 'bar'))
+    def test_e013_invalid_no_color_codes(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E013])
