@@ -125,10 +125,6 @@ class EnhancedUserAdmin(UserAdmin):
     # 'actions' determines the actions, that are accessible from the dropdown
     actions = ['action_bulk_activate_user', 'action_bulk_deactivate_user']
 
-    # 'url_helper' is used to construct URLs by decoupling them from the used
-    #   AUTH_USER_MODEL
-    url_helper = ContentType.objects.get_for_model(get_user_model())
-
     def action_bulk_activate_user(self, request, queryset, user_id=None):
         """Performs bulk activation of users in Django admin.
 
@@ -294,11 +290,15 @@ class EnhancedUserAdmin(UserAdmin):
 
         TODO: Here, server state is modified by a GET-request. *fubar*"""
 
+        # 'url_helper' is used to construct URLs by decoupling them from the used
+        #   AUTH_USER_MODEL
+        url_helper = ContentType.objects.get_for_model(get_user_model())
+
         self.action_bulk_activate_user(request, None, user_id=user_id)
 
         return redirect(
             reverse(
-                'admin:{}_{}_changelist'.format(self.url_helper.app_label, self.url_helper.model)
+                'admin:{}_{}_changelist'.format(url_helper.app_label, url_helper.model)
             )
         )
 
@@ -310,11 +310,15 @@ class EnhancedUserAdmin(UserAdmin):
 
         TODO: Here, server state is modified by a GET-request. *fubar*"""
 
+        # 'url_helper' is used to construct URLs by decoupling them from the used
+        #   AUTH_USER_MODEL
+        url_helper = ContentType.objects.get_for_model(get_user_model())
+
         self.action_bulk_deactivate_user(request, None, user_id=user_id)
 
         return redirect(
             reverse(
-                'admin:{}_{}_changelist'.format(self.url_helper.app_label, self.url_helper.model)
+                'admin:{}_{}_changelist'.format(url_helper.app_label, url_helper.model)
             )
         )
 
