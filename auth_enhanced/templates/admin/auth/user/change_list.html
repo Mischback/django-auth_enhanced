@@ -1,0 +1,16 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+{% comment %}
+This template will provide a legend for the list view of users.
+If a custom user model is used, this template must be provided under the following path 'templates/[app_name]/[user_model_name]/change_list.html'.
+The legend will take into account, which presentation of usernames is used and will include a legend only, if a custom presentation is specified.
+{% endcomment %}
+{% block result_list %}
+  {{ block.super }}
+  {% if enhanceduseradmin_legend %}
+    <p class="paginator small" style="text-align: right;">
+      {% blocktrans %}Legend{% endblocktrans %}:
+      {% if enhanceduseradmin_legend.color %}<span style="color: {{ enhanceduseradmin_legend.color.0 }}; font-weight: bold;">Superuser</span>, <span style="color: {{ enhanceduseradmin_legend.color.1 }}; font-weight: bold;">Staff</span>{% endif %}{% if enhanceduseradmin_legend.color and enhanceduseradmin_legend.char %}, {% endif %}{% if enhanceduseradmin_legend.char %}[{{ enhanceduseradmin_legend.char.0 }}]Superuser, [{{ enhanceduseradmin_legend.char.1 }}]Staff{% endif %}
+    </p>
+  {% endif %}
+{% endblock %}

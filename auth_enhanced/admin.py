@@ -111,6 +111,21 @@ class EnhancedUserAdmin(UserAdmin):
     # Django's default value is just 'username'
     ordering = ('-is_superuser', '-is_staff', 'is_active', 'username')
 
+    def changelist_view(self, request, extra_context=None):
+        """Pass some more context into the view.
+
+        This is used to:
+            - provide the legend for color-coded or prefixed usernames.
+
+        The legend will be provided at the bottom of the list. Please note,
+        that a modified/extended template is used to provide the actual
+        HTML-code for this."""
+
+        extra_context = extra_context or {}
+        extra_context['enhanceduseradmin_legend'] = self.get_additional_legend()
+
+        return super(EnhancedUserAdmin, self).changelist_view(request, extra_context=extra_context)
+
     def get_actions(self, request):
         """Extends the default 'get_actions()'-method to exclude the bulk
         action 'delete objects' from the dropdown."""
@@ -123,6 +138,29 @@ class EnhancedUserAdmin(UserAdmin):
             del actions['delete_selected']
 
         return actions
+
+    def get_additional_legend(self):
+        """Returns a legend depending on the applied settings.
+
+        Especially relevant is the 'list_display' attribute of this class and
+        the settings of 'DAE_ADMIN_USERNAME_STATUS_CHAR' and
+        'DAE_ADMIN_USERNAME_STATUS_COLOR'."""
+
+        result = {}
+
+        try:
+            if 'username_status_char' in self.list_display:
+                result['char'] = settings.DAE_ADMIN_USERNAME_STATUS_CHAR
+        except AttributeError:
+            pass
+
+        try:
+            if 'username_status_color' in self.list_display:
+                result['color'] = settings.DAE_ADMIN_USERNAME_STATUS_COLOR
+        except AttributeError:
+            pass
+
+        return result
 
     def status_aggregated(self, user_obj):
         """Returns the status of an user as string.
@@ -154,7 +192,7 @@ class EnhancedUserAdmin(UserAdmin):
         else:
             return getattr(user_obj, user_obj.USERNAME_FIELD)
 
-        return format_html('[{}] {}', obj_char, getattr(user_obj, user_obj.USERNAME_FIELD))
+        return format_html('[{}]{}', obj_char, getattr(user_obj, user_obj.USERNAME_FIELD))
     username_status_char.short_description = _('Username (status)')
     username_status_char.admin_order_field = '-username'
 

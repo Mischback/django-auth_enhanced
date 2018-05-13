@@ -10,6 +10,7 @@ The app's checks rely on Django's system check framework."""
 from unittest import skip  # noqa
 
 # Django imports
+from django.conf import settings
 from django.test import override_settings, tag  # noqa
 
 # app imports
@@ -192,6 +193,19 @@ class CheckSettingsValuesTests(AuthEnhancedTestCase):
         errors = check_settings_values(None)
         self.assertEqual(errors, [])
 
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=None)
+    def test_e012_missing_setting(self):
+        """Missing setting will be ignored."""
+
+        # actually delete the setting
+        #   Please note, how the setting is first overridden and then deleted.
+        #   This is done to ensure, that this works independently from the
+        #   test settings.
+        del settings.DAE_ADMIN_USERNAME_STATUS_COLOR
+
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
     @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR='foo')
     def test_e012_invalid_no_tuple(self):
         """Invalid values show an error message."""
@@ -213,6 +227,19 @@ class CheckSettingsValuesTests(AuthEnhancedTestCase):
     @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=('#', '$'))
     def test_e013_valid(self):
         """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=None)
+    def test_e013_missing_setting(self):
+        """Missing setting will be ignored."""
+
+        # actually delete the setting
+        #   Please note, how the setting is first overridden and then deleted.
+        #   This is done to ensure, that this works independently from the
+        #   test settings.
+        del settings.DAE_ADMIN_USERNAME_STATUS_CHAR
+
         errors = check_settings_values(None)
         self.assertEqual(errors, [])
 

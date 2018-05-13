@@ -177,7 +177,7 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
         u = get_user_model().objects.get(username='staff_user1')
         self.assertEqual(
             self.admin_obj.username_status_char(u),
-            '[{}] {}'.format('b', getattr(u, u.USERNAME_FIELD))
+            '[{}]{}'.format('b', getattr(u, u.USERNAME_FIELD))
         )
 
     @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=('a', 'b'))
@@ -187,5 +187,74 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
         u = get_user_model().objects.get(username='django')
         self.assertEqual(
             self.admin_obj.username_status_char(u),
-            '[{}] {}'.format('a', getattr(u, u.USERNAME_FIELD))
+            '[{}]{}'.format('a', getattr(u, u.USERNAME_FIELD))
+        )
+
+
+class EnhancedUserAdminTests(AuthEnhancedTestCase):
+
+    def setUp(self):
+        """Per test setup"""
+
+        # create an instance of the admin class
+        self.admin_obj = EnhancedUserAdmin(get_user_model(), AdminSite())
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=('a', 'b'))
+    def test_get_legend_char(self):
+        """Is the legend properly populated?"""
+
+        # override 'list_display' per test
+        self.admin_obj.list_display = ('username_status_char', )
+
+        self.assertEqual(
+            self.admin_obj.get_additional_legend(),
+            {'char': ('a', 'b')}
+        )
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=None)
+    def test_get_legend_char_missing_setting(self):
+        """Legend remains empty, if the corresponding setting is missing."""
+
+        # override 'list_display' per test
+        self.admin_obj.list_display = ('username_status_char', )
+
+        # actually delete the setting
+        #   Please note, how the setting is first overridden and then deleted.
+        #   This is done to ensure, that this works independently from the
+        #   test settings.
+        del settings.DAE_ADMIN_USERNAME_STATUS_CHAR
+
+        self.assertEqual(
+            self.admin_obj.get_additional_legend(),
+            {}
+        )
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=('#f0f0f0', '#0f0f0f'))
+    def test_get_legend_color(self):
+        """Is the legend properly populated?"""
+
+        # override 'list_display' per test
+        self.admin_obj.list_display = ('username_status_color', )
+
+        self.assertEqual(
+            self.admin_obj.get_additional_legend(),
+            {'color': ('#f0f0f0', '#0f0f0f')}
+        )
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=None)
+    def test_get_legend_color_missing_setting(self):
+        """Legend remains empty, if the corresponding setting is missing."""
+
+        # override 'list_display' per test
+        self.admin_obj.list_display = ('username_status_color', )
+
+        # actually delete the setting
+        #   Please note, how the setting is first overridden and then deleted.
+        #   This is done to ensure, that this works independently from the
+        #   test settings.
+        del settings.DAE_ADMIN_USERNAME_STATUS_COLOR
+
+        self.assertEqual(
+            self.admin_obj.get_additional_legend(),
+            {}
         )
