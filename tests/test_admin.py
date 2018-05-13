@@ -33,7 +33,7 @@ class EnhancedUserStatusFilterTest(AuthEnhancedTestCase):
         f_result = f.queryset(None, get_user_model().objects.all())
 
         # number of superusers in fixture is subject to changes!
-        self.assertEqual(len(f_result), 3)
+        self.assertEqual(len(f_result), 7)
 
     def test_filter_staffusers(self):
         """Does the filter return the staff users?"""
@@ -42,7 +42,7 @@ class EnhancedUserStatusFilterTest(AuthEnhancedTestCase):
         f_result = f.queryset(None, get_user_model().objects.all())
 
         # number of superusers in fixture is subject to changes!
-        self.assertEqual(len(f_result), 5)
+        self.assertEqual(len(f_result), 13)
 
     def test_filter_users(self):
         """Does the filter return the default users?"""
@@ -51,7 +51,7 @@ class EnhancedUserStatusFilterTest(AuthEnhancedTestCase):
         f_result = f.queryset(None, get_user_model().objects.all())
 
         # number of superusers in fixture is subject to changes!
-        self.assertEqual(len(f_result), 1)
+        self.assertEqual(len(f_result), 6)
 
     def test_filter_no_filter(self):
         """If the filter is not applied, return the full user list."""
@@ -60,7 +60,7 @@ class EnhancedUserStatusFilterTest(AuthEnhancedTestCase):
         f_result = f.queryset(None, get_user_model().objects.all())
 
         # number of superusers in fixture is subject to changes!
-        self.assertEqual(len(f_result), 6)
+        self.assertEqual(len(f_result), 19)
 
 
 @tag('admin')
@@ -81,19 +81,19 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
     def test_status_aggregated_user(self):
         """Does the method returns the correct status for simple users?"""
 
-        u = get_user_model().objects.get(username='baz')
+        u = get_user_model().objects.get(username='user')
         self.assertEqual(self.admin_obj.status_aggregated(u), 'user')
 
     def test_status_aggregated_staff(self):
         """Does the method returns the correct status for staff users?"""
 
-        u = get_user_model().objects.get(username='staff_user1')
+        u = get_user_model().objects.get(username='staff')
         self.assertEqual(self.admin_obj.status_aggregated(u), 'staff')
 
     def test_status_aggregated_superuser(self):
         """Does the method returns the correct status for superusers?"""
 
-        u = get_user_model().objects.get(username='django')
+        u = get_user_model().objects.get(username='superuser')
         self.assertEqual(self.admin_obj.status_aggregated(u), 'superuser')
 
     @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=None)
@@ -106,7 +106,7 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
         #   test settings.
         del settings.DAE_ADMIN_USERNAME_STATUS_COLOR
 
-        u = get_user_model().objects.get(username='django')
+        u = get_user_model().objects.get(username='superuser')
         self.assertEqual(
             self.admin_obj.username_status_color(u), getattr(u, u.USERNAME_FIELD)
         )
@@ -115,7 +115,7 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
     def test_username_status_color_user(self):
         """Just returns the username, if it is a normal user."""
 
-        u = get_user_model().objects.get(username='baz')
+        u = get_user_model().objects.get(username='user')
         self.assertEqual(
             self.admin_obj.username_status_color(u), getattr(u, u.USERNAME_FIELD)
         )
@@ -124,7 +124,7 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
     def test_username_status_color_staff(self):
         """Applies a color to the username, if staff status."""
 
-        u = get_user_model().objects.get(username='staff_user1')
+        u = get_user_model().objects.get(username='staff')
         self.assertEqual(
             self.admin_obj.username_status_color(u),
             '<span style="color: {};">{}</span>'.format(
@@ -137,7 +137,7 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
     def test_username_status_color_superuser(self):
         """Applies a color to the username, if superuser status."""
 
-        u = get_user_model().objects.get(username='django')
+        u = get_user_model().objects.get(username='superuser')
         self.assertEqual(
             self.admin_obj.username_status_color(u),
             '<span style="color: {};">{}</span>'.format(
@@ -156,7 +156,7 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
         #   test settings.
         del settings.DAE_ADMIN_USERNAME_STATUS_CHAR
 
-        u = get_user_model().objects.get(username='django')
+        u = get_user_model().objects.get(username='superuser')
         self.assertEqual(
             self.admin_obj.username_status_char(u), getattr(u, u.USERNAME_FIELD)
         )
@@ -165,7 +165,7 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
     def test_username_status_char_user(self):
         """Just returns the username, if it is a normal user."""
 
-        u = get_user_model().objects.get(username='baz')
+        u = get_user_model().objects.get(username='user')
         self.assertEqual(
             self.admin_obj.username_status_char(u), getattr(u, u.USERNAME_FIELD)
         )
@@ -174,7 +174,7 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
     def test_username_status_char_staff(self):
         """Applies a color to the username, if staff status."""
 
-        u = get_user_model().objects.get(username='staff_user1')
+        u = get_user_model().objects.get(username='staff')
         self.assertEqual(
             self.admin_obj.username_status_char(u),
             '[{}]{}'.format('b', getattr(u, u.USERNAME_FIELD))
@@ -184,14 +184,16 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
     def test_username_status_char_superuser(self):
         """Applies a color to the username, if superuser status."""
 
-        u = get_user_model().objects.get(username='django')
+        u = get_user_model().objects.get(username='superuser')
         self.assertEqual(
             self.admin_obj.username_status_char(u),
             '[{}]{}'.format('a', getattr(u, u.USERNAME_FIELD))
         )
 
 
+@tag('admin')
 class EnhancedUserAdminTests(AuthEnhancedTestCase):
+    """These tests target the admin class, but do not require any user objects."""
 
     def setUp(self):
         """Per test setup"""
@@ -258,3 +260,19 @@ class EnhancedUserAdminTests(AuthEnhancedTestCase):
             self.admin_obj.get_additional_legend(),
             {}
         )
+
+
+@tag('admin')
+class EnhancedUserAdminRequestsTests(AuthEnhancedTestCase):
+    """These tests target the admin class, but rely on real requests."""
+
+    fixtures = ['tests/utils/fixtures/test_different_users.json']
+
+    def setUp(self):
+        self.client.force_login(
+            get_user_model().objects.get(username='superuser')
+        )
+
+    def test_action_bulk_activate_single_user(self):
+        """Activate a single user by dropdown."""
+        pass
