@@ -11,6 +11,7 @@ from unittest import skip  # noqa
 from django.conf import settings
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.sites import AdminSite
+from django.contrib.admin.templatetags.admin_list import _boolean_icon
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.test import override_settings, tag  # noqa
@@ -195,6 +196,48 @@ class EnhancedUserAdminUserRelatedTests(AuthEnhancedTestCase):
             self.admin_obj.username_status_char(u),
             '[{}]{}'.format('a', getattr(u, u.USERNAME_FIELD))
         )
+
+    def test_toggle_is_active(self):
+        """Should display an activation button for inactive users and a
+        deactivation button for active users."""
+
+        u = get_user_model().objects.get(username='user')
+        self.assertIn(
+            'deactivate',
+            self.admin_obj.toggle_is_active(u)
+        )
+
+        u = get_user_model().objects.get(username='user1')
+        self.assertIn(
+            'activate',
+            self.admin_obj.toggle_is_active(u)
+        )
+
+    def test_is_active_with_action(self):
+        """Should display a Django icon with the button from 'toggle_is_active'."""
+
+        u = get_user_model().objects.get(username='user')
+        retval = self.admin_obj.is_active_with_action(u)
+        self.assertIn('deactivate', retval)
+        self.assertIn(_boolean_icon(u.is_active), retval)
+
+        u = get_user_model().objects.get(username='user1')
+        retval = self.admin_obj.is_active_with_action(u)
+        self.assertIn('activate', retval)
+        self.assertIn(_boolean_icon(u.is_active), retval)
+
+    def test_email_with_verification_status(self):
+        """Should display the user's email address and its verification status."""
+
+        u = get_user_model().objects.get(username='user')
+        retval = self.admin_obj.email_with_verification_status(u)
+        self.assertIn(getattr(u, u.EMAIL_FIELD), retval)
+        self.assertIn(_boolean_icon(u.enhancement.email_is_verified), retval)
+
+        u = get_user_model().objects.get(username='user_not_verified')
+        retval = self.admin_obj.email_with_verification_status(u)
+        self.assertIn(getattr(u, u.EMAIL_FIELD), retval)
+        self.assertIn(_boolean_icon(u.enhancement.email_is_verified), retval)
 
 
 @tag('admin')
@@ -506,7 +549,7 @@ class EnhancedUserAdminRequestsTests(AuthEnhancedTestCase):
             follow=True
         )
 
-        # user should now be active
+        # user should still be active
         self.assertTrue(self.user_model.objects.get(username='superuser').is_active)
 
         # message indicates the activation of 1 user
@@ -517,7 +560,7 @@ class EnhancedUserAdminRequestsTests(AuthEnhancedTestCase):
         )
 
     def test_action_bulk_deactivate_invalid(self):
-        """Activate a multiple users by dropdown."""
+        """Deactivate a multiple users by dropdown."""
 
         # try to activate a single user
         action_data = {
@@ -533,6 +576,70 @@ class EnhancedUserAdminRequestsTests(AuthEnhancedTestCase):
         # message indicates the activation of 1 user
         messages = list(response.wsgi_request._messages)
         # TODO: What if the users are in a different order?
+        self.assertEqual(
+            str(messages[0]),
+            'Nothing was done. Probably this means, that no or invalid user IDs were provided.'
+        )
+
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_MANUAL_ACTIVATION)
+    def test_action_activate_user_valid(self):
+        """Activate a single user by button (pass to bulk method)."""
+
+        u = self.user_model.objects.get(username='user1')
+
+        # check, if the user is inactive
+        self.assertFalse(u.is_active)
+
+        # activate the user (by 'clicking' the button)
+        response = self.client.get(reverse('admin:enhanced-activate-user', args=[u.pk]))
+
+        # the user should be active
+        self.assertTrue(self.user_model.objects.get(username='user1').is_active)
+
+        # message indicates the activation of 1 user
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(str(messages[0]), '1 user was activated successfully (user1).')
+
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_MANUAL_ACTIVATION)
+    def test_action_activate_user_invalid(self):
+        """Invalid user IDs are handled with a simple message."""
+
+        # spoof an invalid user ID
+        response = self.client.get(reverse('admin:enhanced-activate-user', args=[1338]))
+
+        # message indicates, that no user got activated
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(
+            str(messages[0]),
+            'Nothing was done. Probably this means, that no or invalid user IDs were provided.'
+        )
+
+    def test_action_deactivate_user_valid(self):
+        """Deactivate a single user by button (pass to bulk method)."""
+
+        u = self.user_model.objects.get(username='user')
+
+        # check, if the user is inactive
+        self.assertTrue(u.is_active)
+
+        # activate the user (by 'clicking' the button)
+        response = self.client.get(reverse('admin:enhanced-deactivate-user', args=[u.pk]))
+
+        # the user should be active
+        self.assertFalse(self.user_model.objects.get(username='user').is_active)
+
+        # message indicates the activation of 1 user
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(str(messages[0]), '1 user was deactivated successfully (user).')
+
+    def test_action_deactivate_user_invalid(self):
+        """Invalid user IDs are handled with a simple message."""
+
+        # spoof an invalid user ID
+        response = self.client.get(reverse('admin:enhanced-deactivate-user', args=[1338]))
+
+        # message indicates, that no user got activated
+        messages = list(response.wsgi_request._messages)
         self.assertEqual(
             str(messages[0]),
             'Nothing was done. Probably this means, that no or invalid user IDs were provided.'

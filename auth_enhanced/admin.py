@@ -3,11 +3,15 @@
 
 # Django imports
 from django.conf import settings
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.templatetags.admin_list import _boolean_icon
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.messages import ERROR, SUCCESS, WARNING  # noqa
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.messages import ERROR, SUCCESS
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
@@ -118,7 +122,12 @@ class EnhancedUserAdmin(UserAdmin):
     #   statement to the queryset and thus reduce the number of SQL queries.
     list_select_related = ('enhancement',)
 
+    # 'actions' determines the actions, that are accessible from the dropdown
     actions = ['action_bulk_activate_user', 'action_bulk_deactivate_user']
+
+    # 'url_helper' is used to construct URLs by decoupling them from the used
+    #   AUTH_USER_MODEL
+    url_helper = ContentType.objects.get_for_model(get_user_model())
 
     def action_bulk_activate_user(self, request, queryset, user_id=None):
         """Performs bulk activation of users in Django admin.
@@ -277,6 +286,38 @@ class EnhancedUserAdmin(UserAdmin):
             )
     action_bulk_deactivate_user.short_description = _('Deactivate selected users')
 
+    def action_activate_user(self, request, user_id, *args, **kwargs):
+        """This action activates an user-object in Django admin
+
+        This action is accessible as a button per object row and will activate
+        only that single user.
+
+        TODO: Here, server state is modified by a GET-request. *fubar*"""
+
+        self.action_bulk_activate_user(request, None, user_id=user_id)
+
+        return redirect(
+            reverse(
+                'admin:{}_{}_changelist'.format(self.url_helper.app_label, self.url_helper.model)
+            )
+        )
+
+    def action_deactivate_user(self, request, user_id, *args, **kwargs):
+        """This action deactivates an user-object in Django admin
+
+        This action is accessible as a button per object row and will deactivate
+        only that single user.
+
+        TODO: Here, server state is modified by a GET-request. *fubar*"""
+
+        self.action_bulk_deactivate_user(request, None, user_id=user_id)
+
+        return redirect(
+            reverse(
+                'admin:{}_{}_changelist'.format(self.url_helper.app_label, self.url_helper.model)
+            )
+        )
+
     def changelist_view(self, request, extra_context=None):
         """Pass some more context into the view.
 
@@ -338,6 +379,35 @@ class EnhancedUserAdmin(UserAdmin):
 
         return result
 
+    def get_urls(self):
+        """Override get_urls()-method to include our custom admin actions and
+        make them accessible with a single button."""
+
+        # TODO: Write tests for this override!
+        custom_urls = [
+            url(
+                r'^(?P<user_id>.+)/activate/$',
+                self.admin_site.admin_view(self.action_activate_user),
+                name='enhanced-activate-user'
+            ),
+            url(
+                r'^(?P<user_id>.+)/deactivate/$',
+                self.admin_site.admin_view(self.action_deactivate_user),
+                name='enhanced-deactivate-user'
+            ),
+        ]
+
+        return custom_urls + super(EnhancedUserAdmin, self).get_urls()
+
+    def is_active_with_action(self, user_obj):
+        """Combines the activation status with the buttons to modify it."""
+
+        # get the icon (with Django's template tag)
+        icon = _boolean_icon(user_obj.is_active)
+
+        return format_html('{} {}', icon, self.toggle_is_active(user_obj))
+    is_active_with_action.short_description = _('Activation Status')
+
     def status_aggregated(self, user_obj):
         """Returns the status of an user as string.
 
@@ -394,6 +464,30 @@ class EnhancedUserAdmin(UserAdmin):
         )
     username_status_color.short_description = _('Username (status)')
     username_status_color.admin_order_field = '-username'
+
+    def toggle_is_active(self, user_obj):
+        """Shows a button to activate or deactivate an account, depending on
+        'is_active'
+
+        TODO: Write tests for this method!"""
+
+        if user_obj.is_active:
+            # show deactivate button
+            button = format_html(
+                '<a href="{}" class="button">deactivate</a>'.format(
+                    reverse('admin:enhanced-deactivate-user', args=[user_obj.pk])
+                )
+            )
+        else:
+            # show activate button
+            button = format_html(
+                '<a href="{}" class="button">activate</a>'.format(
+                    reverse('admin:enhanced-activate-user', args=[user_obj.pk])
+                )
+            )
+
+        return button
+    toggle_is_active.short_description = _('Modify activation status')
 
 
 @register_only_debug(UserEnhancement)
