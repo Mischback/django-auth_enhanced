@@ -4,6 +4,7 @@
 # Django imports
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.admin.templatetags.admin_list import _boolean_icon
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
@@ -111,6 +112,10 @@ class EnhancedUserAdmin(UserAdmin):
     # Django's default value is just 'username'
     ordering = ('-is_superuser', '-is_staff', 'is_active', 'username')
 
+    # 'list_select_related' will automatically add an 'select_related'
+    #   statement to the queryset and thus reduce the number of SQL queries.
+    list_select_related = ('enhancement',)
+
     def changelist_view(self, request, extra_context=None):
         """Pass some more context into the view.
 
@@ -125,6 +130,16 @@ class EnhancedUserAdmin(UserAdmin):
         extra_context['enhanceduseradmin_legend'] = self.get_additional_legend()
 
         return super(EnhancedUserAdmin, self).changelist_view(request, extra_context=extra_context)
+
+    def email_with_verification_status(self, user_obj):
+        """Combines the email-address and the email's verification status."""
+
+        # get the icon
+        icon = _boolean_icon(user_obj.enhancement.email_is_verified)
+
+        return format_html('{} {}', icon, getattr(user_obj, user_obj.EMAIL_FIELD))
+    email_with_verification_status.short_description = _('EMail Address')
+    email_with_verification_status.admin_order_field = '-email'
 
     def get_actions(self, request):
         """Extends the default 'get_actions()'-method to exclude the bulk
