@@ -9,12 +9,18 @@ from unittest import skip  # noqa
 
 # Django imports
 from django.conf import settings
+from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 from django.test import override_settings, tag  # noqa
+from django.urls import reverse
 
 # app imports
 from auth_enhanced.admin import EnhancedUserAdmin, EnhancedUserStatusFilter
+from auth_enhanced.settings import (
+    DAE_CONST_MODE_EMAIL_ACTIVATION, DAE_CONST_MODE_MANUAL_ACTIVATION,
+)
 
 # app imports
 from .utils.testcases import AuthEnhancedTestCase
@@ -198,6 +204,8 @@ class EnhancedUserAdminTests(AuthEnhancedTestCase):
     def setUp(self):
         """Per test setup"""
 
+        super(EnhancedUserAdminTests, self).setUp()
+
         # create an instance of the admin class
         self.admin_obj = EnhancedUserAdmin(get_user_model(), AdminSite())
 
@@ -269,10 +277,156 @@ class EnhancedUserAdminRequestsTests(AuthEnhancedTestCase):
     fixtures = ['tests/utils/fixtures/test_different_users.json']
 
     def setUp(self):
-        self.client.force_login(
-            get_user_model().objects.get(username='superuser')
-        )
 
+        super(EnhancedUserAdminRequestsTests, self).setUp()
+
+        self.user_model = get_user_model()
+        self.content_type = ContentType.objects.get_for_model(self.user_model)
+        self.client.force_login(self.user_model.objects.get(username='superuser'))
+
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_MANUAL_ACTIVATION)
     def test_action_bulk_activate_single_user(self):
         """Activate a single user by dropdown."""
-        pass
+
+        u = self.user_model.objects.get(username='user1')
+
+        # check, if the user is inactive
+        self.assertFalse(u.is_active)
+
+        # try to activate a single user
+        action_data = {
+            ACTION_CHECKBOX_NAME: [u.pk],
+            'action': 'action_bulk_activate_user'
+        }
+        response = self.client.post(
+            reverse('admin:{}_{}_changelist'.format(self.content_type.app_label, self.content_type.model)),
+            action_data,
+            follow=True
+        )
+
+        # user should now be active
+        self.assertTrue(self.user_model.objects.get(username='user1').is_active)
+
+        # message indicates the activation of 1 user
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(str(messages[0]), '1 user was activated successfully (user1).')
+
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_MANUAL_ACTIVATION)
+    def test_action_bulk_activate_multiple_users(self):
+        """Activate a multiple users by dropdown."""
+
+        u = self.user_model.objects.get(username='user1')
+        v = self.user_model.objects.get(username='user2')
+
+        # check, if the user is inactive
+        self.assertFalse(u.is_active)
+        self.assertFalse(v.is_active)
+
+        # try to activate a single user
+        action_data = {
+            ACTION_CHECKBOX_NAME: [u.pk, v.pk],
+            'action': 'action_bulk_activate_user'
+        }
+        response = self.client.post(
+            reverse('admin:{}_{}_changelist'.format(self.content_type.app_label, self.content_type.model)),
+            action_data,
+            follow=True
+        )
+
+        # user should now be active
+        self.assertTrue(self.user_model.objects.get(username='user1').is_active)
+        self.assertTrue(self.user_model.objects.get(username='user2').is_active)
+
+        # message indicates the activation of 1 user
+        messages = list(response.wsgi_request._messages)
+        # TODO: What if the users are in a different order?
+        self.assertEqual(str(messages[0]), '2 users were activated successfully (user1, user2).')
+
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
+    def test_action_bulk_activate_single_user_fail(self):
+        """Activate a single user by dropdown."""
+
+        u = self.user_model.objects.get(username='user2')
+
+        # check, if the user is inactive
+        self.assertFalse(u.is_active)
+
+        # try to activate a single user
+        action_data = {
+            ACTION_CHECKBOX_NAME: [u.pk],
+            'action': 'action_bulk_activate_user'
+        }
+        response = self.client.post(
+            reverse('admin:{}_{}_changelist'.format(self.content_type.app_label, self.content_type.model)),
+            action_data,
+            follow=True
+        )
+
+        # user should now be active
+        self.assertFalse(self.user_model.objects.get(username='user2').is_active)
+
+        # message indicates the activation of 1 user
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(
+            str(messages[0]),
+            "1 user could not be activated, because his email address is not "
+            "verified (user2)!"
+        )
+
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
+    def test_action_bulk_activate_multiple_users_fail(self):
+        """Activate a multiple users by dropdown."""
+
+        u = self.user_model.objects.get(username='user2')
+        v = self.user_model.objects.get(username='user3')
+
+        # check, if the user is inactive
+        self.assertFalse(u.is_active)
+        self.assertFalse(v.is_active)
+
+        # try to activate a single user
+        action_data = {
+            ACTION_CHECKBOX_NAME: [u.pk, v.pk],
+            'action': 'action_bulk_activate_user'
+        }
+        response = self.client.post(
+            reverse('admin:{}_{}_changelist'.format(self.content_type.app_label, self.content_type.model)),
+            action_data,
+            follow=True
+        )
+
+        # user should now be active
+        self.assertFalse(self.user_model.objects.get(username='user2').is_active)
+        self.assertFalse(self.user_model.objects.get(username='user3').is_active)
+
+        # message indicates the activation of 1 user
+        messages = list(response.wsgi_request._messages)
+        # TODO: What if the users are in a different order?
+        self.assertEqual(
+            str(messages[0]),
+            "2 users could not be activated, because their email addresses are "
+            "not verified (user2, user3)!"
+        )
+
+    @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
+    def test_action_bulk_activate_invalid(self):
+        """Activate a multiple users by dropdown."""
+
+        # try to activate a single user
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1338],
+            'action': 'action_bulk_activate_user'
+        }
+        response = self.client.post(
+            reverse('admin:{}_{}_changelist'.format(self.content_type.app_label, self.content_type.model)),
+            action_data,
+            follow=True
+        )
+
+        # message indicates the activation of 1 user
+        messages = list(response.wsgi_request._messages)
+        # TODO: What if the users are in a different order?
+        self.assertEqual(
+            str(messages[0]),
+            'Nothing was done. Probably this means, that no or invalid user IDs were provided.'
+        )

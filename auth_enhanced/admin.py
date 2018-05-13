@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.contrib.admin.templatetags.admin_list import _boolean_icon
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.messages import ERROR, SUCCESS, WARNING
+from django.contrib.messages import ERROR, SUCCESS, WARNING  # noqa
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
@@ -152,7 +152,7 @@ class EnhancedUserAdmin(UserAdmin):
                 not_activated.append(getattr(user, user_model.USERNAME_FIELD))
             else:
                 user.is_active = True
-                user.save()
+                user.save(update_fields=['is_active'])
                 activated.append(getattr(user, user_model.USERNAME_FIELD))
 
         # return messages for successfully activated accounts
