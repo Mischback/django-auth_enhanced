@@ -430,3 +430,110 @@ class EnhancedUserAdminRequestsTests(AuthEnhancedTestCase):
             str(messages[0]),
             'Nothing was done. Probably this means, that no or invalid user IDs were provided.'
         )
+
+    def test_action_bulk_deactivate_single_user(self):
+        """Deactivate a single user by dropdown."""
+
+        u = self.user_model.objects.get(username='user')
+
+        # check, if the user is inactive
+        self.assertTrue(u.is_active)
+
+        # try to activate a single user
+        action_data = {
+            ACTION_CHECKBOX_NAME: [u.pk],
+            'action': 'action_bulk_deactivate_user'
+        }
+        response = self.client.post(
+            reverse('admin:{}_{}_changelist'.format(self.content_type.app_label, self.content_type.model)),
+            action_data,
+            follow=True
+        )
+
+        # user should now be active
+        self.assertFalse(self.user_model.objects.get(username='user').is_active)
+
+        # message indicates the activation of 1 user
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(str(messages[0]), '1 user was deactivated successfully (user).')
+
+    def test_action_bulk_deactivate_multiple_users(self):
+        """Deactivate a multiple users by dropdown."""
+
+        u = self.user_model.objects.get(username='user')
+        v = self.user_model.objects.get(username='user_in_progress')
+
+        # check, if the user is inactive
+        self.assertTrue(u.is_active)
+        self.assertTrue(v.is_active)
+
+        # try to activate a single user
+        action_data = {
+            ACTION_CHECKBOX_NAME: [u.pk, v.pk],
+            'action': 'action_bulk_deactivate_user'
+        }
+        response = self.client.post(
+            reverse('admin:{}_{}_changelist'.format(self.content_type.app_label, self.content_type.model)),
+            action_data,
+            follow=True
+        )
+
+        # user should now be active
+        self.assertFalse(self.user_model.objects.get(username='user').is_active)
+        self.assertFalse(self.user_model.objects.get(username='user_in_progress').is_active)
+
+        # message indicates the activation of 1 user
+        messages = list(response.wsgi_request._messages)
+        # TODO: What if the users are in a different order?
+        self.assertEqual(str(messages[0]), '2 users were deactivated successfully (user, user_in_progress).')
+
+    def test_action_bulk_deactivate_single_user_fail(self):
+        """Deactivate a single user by dropdown."""
+
+        u = self.user_model.objects.get(username='superuser')
+
+        # check, if the user is inactive
+        self.assertTrue(u.is_active)
+
+        # try to activate a single user
+        action_data = {
+            ACTION_CHECKBOX_NAME: [u.pk],
+            'action': 'action_bulk_deactivate_user'
+        }
+        response = self.client.post(
+            reverse('admin:{}_{}_changelist'.format(self.content_type.app_label, self.content_type.model)),
+            action_data,
+            follow=True
+        )
+
+        # user should now be active
+        self.assertTrue(self.user_model.objects.get(username='superuser').is_active)
+
+        # message indicates the activation of 1 user
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(
+            str(messages[0]),
+            "1 user could not be deactivated, because this is your own account (superuser)!"
+        )
+
+    def test_action_bulk_deactivate_invalid(self):
+        """Activate a multiple users by dropdown."""
+
+        # try to activate a single user
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1338],
+            'action': 'action_bulk_deactivate_user'
+        }
+        response = self.client.post(
+            reverse('admin:{}_{}_changelist'.format(self.content_type.app_label, self.content_type.model)),
+            action_data,
+            follow=True
+        )
+
+        # message indicates the activation of 1 user
+        messages = list(response.wsgi_request._messages)
+        # TODO: What if the users are in a different order?
+        self.assertEqual(
+            str(messages[0]),
+            'Nothing was done. Probably this means, that no or invalid user IDs were provided.'
+        )

@@ -118,7 +118,7 @@ class EnhancedUserAdmin(UserAdmin):
     #   statement to the queryset and thus reduce the number of SQL queries.
     list_select_related = ('enhancement',)
 
-    actions = ['action_bulk_activate_user', ]
+    actions = ['action_bulk_activate_user', 'action_bulk_deactivate_user']
 
     def action_bulk_activate_user(self, request, queryset, user_id=None):
         """Performs bulk activation of users in Django admin.
@@ -199,6 +199,83 @@ class EnhancedUserAdmin(UserAdmin):
                 ERROR,
             )
     action_bulk_activate_user.short_description = _('Activate selected users')
+
+    def action_bulk_deactivate_user(self, request, queryset, user_id=None):
+        """Performs bulk deactivation of users in Django admin.
+
+        This action is accessible from the drop-down menu and works together
+        with selecting user objects by checking their respective checkbox.
+        Furthermore, it handles the actual deactivation of single user aswell,
+        because ultimatively, this method is used to perform the deactivation
+        when 'action_deactivate_user()' is called."""
+
+        deactivated = []
+        not_deactivated = []
+        user_model = get_user_model()
+
+        # the method is called from 'action_deactivate_user', so a queryset has
+        #   to be constructed...
+        if user_id and not queryset:
+            try:
+                queryset = [user_model.objects.get(pk=user_id)]
+            except user_model.DoesNotExist:
+                # provide an empty queryset. This mimics the behaviour of
+                #   Django, if invalid user IDs are provided in the POST-request
+                queryset = []
+
+        # at this point, 'queryset' is filled and can be iterated
+        for user in queryset:
+            if user == request.user:
+                not_deactivated.append(getattr(user, user_model.USERNAME_FIELD))
+            else:
+                user.is_active = False
+                user.save(update_fields=['is_active'])
+                deactivated.append(getattr(user, user_model.USERNAME_FIELD))
+
+        # return messages for successfully deactivated accounts
+        if deactivated:
+            count = len(deactivated)
+            self.message_user(
+                request,
+                ungettext_lazy(
+                    '%(count)d user was deactivated successfully (%(deactivated_list)s).',
+                    '%(count)d users were deactivated successfully (%(deactivated_list)s).',
+                    count
+                ) % {
+                    'count': count,
+                    'deactivated_list': ', '.join(deactivated),
+                },
+                SUCCESS,
+            )
+
+        # return messages for accounts, that could not be deactivated
+        #   This should only return a message, if the superuser tries to
+        #   deactivate his own account
+        if not_deactivated:
+            count = len(not_deactivated)
+            self.message_user(
+                request,
+                ungettext_lazy(
+                    "%(count)d user could not be deactivated, because this is "
+                    "your own account (%(deactivated_list)s)!",
+                    "%(count)d users could not be deactivated (%(deactivated_list)s)!",
+                    count
+                ) % {
+                    'count': count,
+                    'deactivated_list': ', '.join(not_deactivated),
+                },
+                ERROR,
+            )
+
+        # the method did nothing; this means something unexpected happened,
+        #   i.e. invalid user IDs were provided
+        if not (deactivated or not_deactivated):
+            self.message_user(
+                request,
+                _('Nothing was done. Probably this means, that no or invalid user IDs were provided.'),
+                ERROR,
+            )
+    action_bulk_deactivate_user.short_description = _('Deactivate selected users')
 
     def changelist_view(self, request, extra_context=None):
         """Pass some more context into the view.
