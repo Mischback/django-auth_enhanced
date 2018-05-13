@@ -7,11 +7,13 @@ from django.contrib import admin
 from django.contrib.admin.templatetags.admin_list import _boolean_icon
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.messages import ERROR, SUCCESS, WARNING
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 # app imports
 from auth_enhanced.models import UserEnhancement
+from auth_enhanced.settings import DAE_CONST_MODE_EMAIL_ACTIVATION
 
 
 def register_only_debug(*models, **kwargs):
@@ -115,6 +117,88 @@ class EnhancedUserAdmin(UserAdmin):
     # 'list_select_related' will automatically add an 'select_related'
     #   statement to the queryset and thus reduce the number of SQL queries.
     list_select_related = ('enhancement',)
+
+    actions = ['action_bulk_activate_user', ]
+
+    def action_bulk_activate_user(self, request, queryset, user_id=None):
+        """Performs bulk activation of users in Django admin.
+
+        This action is accessible from the drop-down menu and works together
+        with selecting user objects by checking their respective checkbox.
+        Furthermore, it handles the actual activation of single user aswell,
+        because ultimatively, this method is used to perform the activation
+        when 'action_activate_user()' is called."""
+
+        activated = []
+        not_activated = []
+        user_model = get_user_model()
+
+        # the method is called from 'action_activate_user', so a queryset has
+        #   to be constructed...
+        if user_id and not queryset:
+            try:
+                queryset = [user_model.objects.get(pk=user_id)]
+            except user_model.DoesNotExist:
+                # provide an empty queryset. This mimics the behaviour of
+                #   Django, if invalid user IDs are provided in the POST-request
+                queryset = []
+
+        # at this point, 'queryset' is filled and can be iterated
+        for user in queryset:
+            if (
+                settings.DAE_OPERATION_MODE == DAE_CONST_MODE_EMAIL_ACTIVATION and
+                not user.enhancement.email_is_verified
+            ):
+                not_activated.append(getattr(user, user_model.USERNAME_FIELD))
+            else:
+                user.is_active = True
+                user.save()
+                activated.append(getattr(user, user_model.USERNAME_FIELD))
+
+        # return messages for successfully activated accounts
+        if activated:
+            count = len(activated)
+            self.message_user(
+                request,
+                ungettext_lazy(
+                    '%(count)d user was activated successfully (%(activated_list)s).',
+                    '%(count)d users were activated successfully (%(activated_list)s).',
+                    count
+                ) % {
+                    'count': count,
+                    'activated_list': ', '.join(activated),
+                },
+                SUCCESS,
+            )
+
+        # return messages for accounts, that could not be activated, because
+        #   their mail address is not verified
+        if not_activated:
+            count = len(not_activated)
+            self.message_user(
+                request,
+                ungettext_lazy(
+                    "%(count)d user could not be activated, because his email "
+                    "address is not verified (%(activated_list)s)!",
+                    "%(count)d users could not be activated, because their "
+                    "email addresses are not verified (%(activated_list)s)!",
+                    count
+                ) % {
+                    'count': count,
+                    'activated_list': ', '.join(not_activated),
+                },
+                ERROR,
+            )
+
+        # the method did nothing; this means something unexpected happened,
+        #   i.e. invalid user IDs were provided
+        if not (activated or not_activated):
+            self.message_user(
+                request,
+                _('Nothing was done. Probably this means, that no or invalid user IDs were provided.'),
+                ERROR,
+            )
+    action_bulk_activate_user.short_description = _('Activate selected users')
 
     def changelist_view(self, request, extra_context=None):
         """Pass some more context into the view.
