@@ -101,6 +101,9 @@ class EnhancedUserAdmin(UserAdmin):
     # 'search_fields' determines the target fields for the search box
     # The search box can be disabled with an app-specific setting, accordingly
     #   the 'search_field' will be set to an empty tuple.
+    # TODO: This is *wrong*. DAE_ADMIN_SHOW_SEARCHBOX should not be a boolean
+    #   value, but a tuple, just like DAE_ADMIN_LIST_DISPLAY
+    #   This is required to actually support custom user models.
     try:
         if not settings.DAE_ADMIN_SHOW_SEARCHBOX:
             search_fields = ()
