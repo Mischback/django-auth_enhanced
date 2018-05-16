@@ -382,8 +382,9 @@ class EnhancedUserAdminRequestsTests(AuthEnhancedTestCase):
 
         # message indicates the activation of 1 user
         messages = list(response.wsgi_request._messages)
-        # TODO: What if the users are in a different order?
-        self.assertEqual(str(messages[0]), '2 users were activated successfully (user1, user2).')
+        self.assertIn('2 users were activated successfully', str(messages[0]))
+        self.assertIn('user1', str(messages[0]))
+        self.assertIn('user2', str(messages[0]))
 
     @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
     def test_action_bulk_activate_single_user_fail(self):
@@ -444,12 +445,13 @@ class EnhancedUserAdminRequestsTests(AuthEnhancedTestCase):
 
         # message indicates the activation of 1 user
         messages = list(response.wsgi_request._messages)
-        # TODO: What if the users are in a different order?
-        self.assertEqual(
-            str(messages[0]),
+        self.assertIn(
             "2 users could not be activated, because their email addresses are "
-            "not verified (user2, user3)!"
+            "not verified",
+            str(messages[0]),
         )
+        self.assertIn('user2', str(messages[0]))
+        self.assertIn('user3', str(messages[0]))
 
     @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
     def test_action_bulk_activate_invalid(self):
@@ -468,7 +470,6 @@ class EnhancedUserAdminRequestsTests(AuthEnhancedTestCase):
 
         # message indicates the activation of 1 user
         messages = list(response.wsgi_request._messages)
-        # TODO: What if the users are in a different order?
         self.assertEqual(
             str(messages[0]),
             'Nothing was done. Probably this means, that no or invalid user IDs were provided.'
@@ -527,8 +528,9 @@ class EnhancedUserAdminRequestsTests(AuthEnhancedTestCase):
 
         # message indicates the activation of 1 user
         messages = list(response.wsgi_request._messages)
-        # TODO: What if the users are in a different order?
-        self.assertEqual(str(messages[0]), '2 users were deactivated successfully (user, user_in_progress).')
+        self.assertIn('2 users were deactivated successfully', str(messages[0]))
+        self.assertIn('user', str(messages[0]))
+        self.assertIn('user_in_progress', str(messages[0]))
 
     def test_action_bulk_deactivate_single_user_fail(self):
         """Deactivate a single user by dropdown."""
@@ -575,7 +577,6 @@ class EnhancedUserAdminRequestsTests(AuthEnhancedTestCase):
 
         # message indicates the activation of 1 user
         messages = list(response.wsgi_request._messages)
-        # TODO: What if the users are in a different order?
         self.assertEqual(
             str(messages[0]),
             'Nothing was done. Probably this means, that no or invalid user IDs were provided.'

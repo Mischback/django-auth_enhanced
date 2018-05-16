@@ -88,10 +88,6 @@ class EnhancedUserAdmin(UserAdmin):
     # This is configurable with an app-specific setting or will be left at
     # Django's default value:
     #   ('username', 'email', 'first_name', 'last_name', 'is_staff')
-    # TODO: Django already checks the value of 'list_display', so it might be
-    #   unnecessary to actually check DAE_ADMIN_LIST_DISPLAY within the app.
-    #   However, it should be ensured, that the app's setting only includes
-    #   valid values, which depends on the AUTH_USER_MODEL in use.
     try:
         list_display = settings.DAE_ADMIN_LIST_DISPLAY
     except AttributeError:
@@ -288,7 +284,7 @@ class EnhancedUserAdmin(UserAdmin):
         This action is accessible as a button per object row and will activate
         only that single user.
 
-        TODO: Here, server state is modified by a GET-request. *fubar*"""
+        FIXME: Here, server state is modified by a GET-request. *fubar*"""
 
         # 'url_helper' is used to construct URLs by decoupling them from the used
         #   AUTH_USER_MODEL
@@ -308,7 +304,7 @@ class EnhancedUserAdmin(UserAdmin):
         This action is accessible as a button per object row and will deactivate
         only that single user.
 
-        TODO: Here, server state is modified by a GET-request. *fubar*"""
+        FIXME: Here, server state is modified by a GET-request. *fubar*"""
 
         # 'url_helper' is used to construct URLs by decoupling them from the used
         #   AUTH_USER_MODEL
@@ -385,9 +381,11 @@ class EnhancedUserAdmin(UserAdmin):
 
     def get_urls(self):
         """Override get_urls()-method to include our custom admin actions and
-        make them accessible with a single button."""
+        make them accessible with a single button.
 
-        # TODO: Write tests for this override!
+        This method is not unittested! But the URLs are used in several other
+        unittests, so any error in this method would be revealed."""
+
         custom_urls = [
             url(
                 r'^(?P<user_id>.+)/activate/$',
@@ -471,9 +469,7 @@ class EnhancedUserAdmin(UserAdmin):
 
     def toggle_is_active(self, user_obj):
         """Shows a button to activate or deactivate an account, depending on
-        'is_active'
-
-        TODO: Write tests for this method!"""
+        'is_active'."""
 
         if user_obj.is_active:
             # show deactivate button

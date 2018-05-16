@@ -50,7 +50,6 @@ class EmailVerificationForm(Form):
                 code='dae_token_expired'
             )
         except EnhancedCrypto.EnhancedCryptoException:
-            # TODO: provide some meaningful error message here
             raise ValidationError(
                 _("Your submitted token could not be verified!"),
                 code='dae_token_could_not_be_verified'
@@ -77,7 +76,6 @@ class EmailVerificationForm(Form):
             enhancement = UserEnhancement.objects.get(user=user_to_be_activated)
         except UserEnhancement.DoesNotExist:
             # logical database integrity FAILED
-            # TODO: Should this be raised? Or handle it gracefully by creating an enhancement-object?
             enhancement = UserEnhancement.objects.create(user=user_to_be_activated)
 
         # update the verification status
