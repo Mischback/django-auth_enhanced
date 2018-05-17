@@ -71,7 +71,7 @@ def callback_admin_information_new_signup(sender, instance, created, **kwargs):
     This function acts like a callback to a 'post_save'-signal."""
 
     # only send email on new registration
-    if created:
+    if created and settings.DAE_ADMIN_SIGNUP_NOTIFICATION:
 
         # set the email subject
         mail_subject = _('New Signup Notification')

@@ -122,6 +122,22 @@ class AdminInformationNewSignupTests(AuthEnhancedTestCase):
             settings.DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX
         ))
 
+    @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=False)
+    def test_callback_notification_false(self):
+        """Recipient list can not be prepared if DAE_ADMIN_SIGNUP_NOTIFICATION is False.
+
+        See 'callback_admin_information_new_signup()'-function."""
+
+        # create a User object to pass along
+        u = get_user_model().objects.create(username='foo')
+
+        retval = callback_admin_information_new_signup(
+            get_user_model(),
+            u,
+            True
+        )
+        self.assertFalse(retval)
+
     @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_AUTO_ACTIVATION)
     def test_callback_apply_mode_auto(self):
         """Is 'context['mode_auto']' set?
