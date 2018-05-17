@@ -92,6 +92,15 @@ def inject_setting(name, default_value):
 def set_app_default_settings():
     """Sets all app-specific default settings."""
 
+    # ### DAE_ADMIN_SHOW_SEARCHBOX
+    # This setting controls, if the searchbox in admin's list view will be
+    #   activated.
+    # Possible values:
+    #   False or True (default value, like Django default)
+    #   In case of True, Django's default value for the fields to search in
+    #   is used.
+    inject_setting('DAE_ADMIN_SHOW_SEARCHBOX', True)
+
     # ### DAE_ADMIN_SIGNUP_NOTIFICATION
     # This setting controls, if emails will be sent to specified superusers/
     #   admins whenever a new user signs up.

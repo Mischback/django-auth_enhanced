@@ -3,6 +3,7 @@
 
 .SILENT:
 .PHONY: benchmark clean coverage doc doc-srv flake8 isort isort-full test \
+		test-tag test-time todo
 		check createsuperuser django migrate runserver shell
 
 
@@ -56,6 +57,10 @@ test-tag:
 # runs the tests with timing information
 test-time:
 	$(MAKE) test test_cmd="--time"
+
+# fetch a list of TODOs
+todo:
+	git grep -n "TODO"
 
 ##### wrapper for django-admin commands #####
 

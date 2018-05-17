@@ -87,8 +87,5 @@ LOGIN_REDIRECT_URL = '/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ### CURRENT DEVELOPMENT
-DAE_ADMIN_SIGNUP_NOTIFICATION = (
-    ('django', 'django@localhost', ('mail', )),
-)
-
-DAE_OPERATION_MODE = 'email-verification'
+# DAE_ADMIN_LIST_DISPLAY = ('username_status_color', 'email_with_verification_status', 'is_active', 'toggle_is_active')
+# DAE_ADMIN_USERNAME_STATUS_COLOR = ('#cc0000', '#00cc00')

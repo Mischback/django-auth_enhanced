@@ -10,12 +10,13 @@ The app's checks rely on Django's system check framework."""
 from unittest import skip  # noqa
 
 # Django imports
+from django.conf import settings
 from django.test import override_settings, tag  # noqa
 
 # app imports
 from auth_enhanced.checks import (
-    E001, E002, E003, E004, E008, E009, E010, W005, W006, W007,
-    check_settings_values,
+    E001, E002, E003, E004, E008, E009, E010, E011, E012, E013, W005, W006,
+    W007, check_settings_values,
 )
 from auth_enhanced.settings import (
     DAE_CONST_MODE_AUTO_ACTIVATION, DAE_CONST_RECOMMENDED_LOGIN_URL,
@@ -173,3 +174,91 @@ class CheckSettingsValuesTests(AuthEnhancedTestCase):
         Actually, 'None' is the only way to raise this error."""
         errors = check_settings_values(None)
         self.assertEqual(errors, [E010])
+
+    @skip('currently inactive')
+    @override_settings(DAE_ADMIN_SHOW_SEARCHBOX=True)
+    def test_e011_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @skip('currently inactive')
+    @override_settings(DAE_ADMIN_SHOW_SEARCHBOX='foo')
+    def test_e011_invalid(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E011])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=('#0f0f0f', '#f0f0f0'))
+    def test_e012_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=None)
+    def test_e012_missing_setting(self):
+        """Missing setting will be ignored."""
+
+        # actually delete the setting
+        #   Please note, how the setting is first overridden and then deleted.
+        #   This is done to ensure, that this works independently from the
+        #   test settings.
+        del settings.DAE_ADMIN_USERNAME_STATUS_COLOR
+
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR='foo')
+    def test_e012_invalid_no_tuple(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E012])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=('foo', 'bar', 'baz'))
+    def test_e012_invalid_invalid_number_of_parameters(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E012])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_COLOR=('foo', 'bar'))
+    def test_e012_invalid_no_color_codes(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E012])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=('#', '$'))
+    def test_e013_valid(self):
+        """Check should accept valid values."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=None)
+    def test_e013_missing_setting(self):
+        """Missing setting will be ignored."""
+
+        # actually delete the setting
+        #   Please note, how the setting is first overridden and then deleted.
+        #   This is done to ensure, that this works independently from the
+        #   test settings.
+        del settings.DAE_ADMIN_USERNAME_STATUS_CHAR
+
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR='foo')
+    def test_e013_invalid_no_tuple(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E013])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=('#', '$', '!'))
+    def test_e013_invalid_invalid_number_of_parameters(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E013])
+
+    @override_settings(DAE_ADMIN_USERNAME_STATUS_CHAR=('foo', 'bar'))
+    def test_e013_invalid_no_color_codes(self):
+        """Invalid values show an error message."""
+        errors = check_settings_values(None)
+        self.assertEqual(errors, [E013])
