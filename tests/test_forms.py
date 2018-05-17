@@ -147,9 +147,12 @@ class SignupFormTests(AuthEnhancedTestCase):
     """These tests target the SignupForm.
 
     SignupForm is derived from Django's 'UserCreationForm' and adds some small
-    additional functions.
+    additional functions."""
 
-    TODO: Cache 'get_user_model()' in class variable or something..."""
+    @classmethod
+    def setUpClass(cls):
+        super(SignupFormTests, cls).setUpClass()
+        cls.user_model = get_user_model()
 
     @tag('settings', 'setting_operation_mode')
     @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_AUTO_ACTIVATION)
@@ -159,7 +162,7 @@ class SignupFormTests(AuthEnhancedTestCase):
         See '__init__()'-method."""
 
         form = SignupForm()
-        self.assertNotIn(get_user_model().EMAIL_FIELD, form.fields)
+        self.assertNotIn(self.user_model.EMAIL_FIELD, form.fields)
 
     @tag('settings', 'setting_operation_mode')
     @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_MANUAL_ACTIVATION)
@@ -169,7 +172,7 @@ class SignupFormTests(AuthEnhancedTestCase):
         See '__init__()'-method."""
 
         form = SignupForm()
-        self.assertNotIn(get_user_model().EMAIL_FIELD, form.fields)
+        self.assertNotIn(self.user_model.EMAIL_FIELD, form.fields)
 
     @tag('settings', 'setting_operation_mode')
     @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
@@ -179,7 +182,7 @@ class SignupFormTests(AuthEnhancedTestCase):
         See '__init__()'-method."""
 
         form = SignupForm()
-        self.assertIn(get_user_model().EMAIL_FIELD, form.fields)
+        self.assertIn(self.user_model.EMAIL_FIELD, form.fields)
 
     @tag('settings', 'setting_operation_mode')
     @override_settings(DAE_OPERATION_MODE=DAE_CONST_MODE_EMAIL_ACTIVATION)
@@ -190,7 +193,7 @@ class SignupFormTests(AuthEnhancedTestCase):
 
         form = SignupForm(
             data={
-                get_user_model().USERNAME_FIELD: 'foo',
+                self.user_model.USERNAME_FIELD: 'foo',
                 'password1': 'foo',
                 'password2': 'foo'
             }
@@ -207,10 +210,10 @@ class SignupFormTests(AuthEnhancedTestCase):
 
         form = SignupForm(
             data={
-                get_user_model().USERNAME_FIELD: 'foo',
+                self.user_model.USERNAME_FIELD: 'foo',
                 'password1': 'foo',
                 'password2': 'foo',
-                get_user_model().EMAIL_FIELD: ''
+                self.user_model.EMAIL_FIELD: ''
             }
         )
         self.assertFalse(form.is_valid())
@@ -225,10 +228,10 @@ class SignupFormTests(AuthEnhancedTestCase):
 
         form = SignupForm(
             data={
-                get_user_model().USERNAME_FIELD: 'foo',
+                self.user_model.USERNAME_FIELD: 'foo',
                 'password1': 'foo',
                 'password2': 'foo',
-                get_user_model().EMAIL_FIELD: 'foo.localhost'
+                self.user_model.EMAIL_FIELD: 'foo.localhost'
             }
         )
         self.assertFalse(form.is_valid())
@@ -246,10 +249,10 @@ class SignupFormTests(AuthEnhancedTestCase):
 
         form = SignupForm(
             data={
-                get_user_model().USERNAME_FIELD: 'foo',
+                self.user_model.USERNAME_FIELD: 'foo',
                 'password1': 'foo',
                 'password2': 'foo',
-                get_user_model().EMAIL_FIELD: 'foo@localhost'
+                self.user_model.EMAIL_FIELD: 'foo@localhost'
             }
         )
         self.assertTrue(form.is_valid())
@@ -261,17 +264,17 @@ class SignupFormTests(AuthEnhancedTestCase):
 
         See 'clean()'-method."""
 
-        user = get_user_model().objects.create(**{          # noqa
-            get_user_model().USERNAME_FIELD: 'django',      # noqa
-            get_user_model().EMAIL_FIELD: 'foo@localhost'   # noqa
+        user = self.user_model.objects.create(**{          # noqa
+            self.user_model.USERNAME_FIELD: 'django',      # noqa
+            self.user_model.EMAIL_FIELD: 'foo@localhost'   # noqa
         })                                                  # noqa
 
         form = SignupForm(
             data={
-                get_user_model().USERNAME_FIELD: 'foo',
+                self.user_model.USERNAME_FIELD: 'foo',
                 'password1': 'foo',
                 'password2': 'foo',
-                get_user_model().EMAIL_FIELD: 'foo@localhost'
+                self.user_model.EMAIL_FIELD: 'foo@localhost'
             }
         )
         self.assertFalse(form.is_valid())
@@ -292,7 +295,7 @@ class SignupFormTests(AuthEnhancedTestCase):
 
         form = SignupForm(
             data={
-                get_user_model().USERNAME_FIELD: 'foo',
+                self.user_model.USERNAME_FIELD: 'foo',
                 'password1': 'foo',
                 'password2': 'foo'
             }
@@ -302,9 +305,9 @@ class SignupFormTests(AuthEnhancedTestCase):
         user = form.save(commit=False)  # noqa
 
         # it should not be possible to fetch the user from the DB
-        with self.assertRaises(get_user_model().DoesNotExist):
-            db_user = get_user_model().objects.get(**{      # noqa
-                get_user_model().USERNAME_FIELD: 'foo',     # noqa
+        with self.assertRaises(self.user_model.DoesNotExist):
+            db_user = self.user_model.objects.get(**{      # noqa
+                self.user_model.USERNAME_FIELD: 'foo',     # noqa
             })                                              # noqa
 
     @tag('settings', 'setting_operation_mode')
@@ -317,7 +320,7 @@ class SignupFormTests(AuthEnhancedTestCase):
 
         form = SignupForm(
             data={
-                get_user_model().USERNAME_FIELD: 'foo',
+                self.user_model.USERNAME_FIELD: 'foo',
                 'password1': 'foo',
                 'password2': 'foo'
             }
@@ -337,7 +340,7 @@ class SignupFormTests(AuthEnhancedTestCase):
 
         form = SignupForm(
             data={
-                get_user_model().USERNAME_FIELD: 'foo',
+                self.user_model.USERNAME_FIELD: 'foo',
                 'password1': 'foo',
                 'password2': 'foo'
             }
@@ -357,8 +360,8 @@ class SignupFormTests(AuthEnhancedTestCase):
 
         form = SignupForm(
             data={
-                get_user_model().USERNAME_FIELD: 'foo',
-                get_user_model().EMAIL_FIELD: 'foo@localhost',
+                self.user_model.USERNAME_FIELD: 'foo',
+                self.user_model.EMAIL_FIELD: 'foo@localhost',
                 'password1': 'foo',
                 'password2': 'foo'
             }

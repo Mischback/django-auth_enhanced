@@ -35,7 +35,6 @@ class AuthEnhancedEmail(EmailMultiAlternatives):
         super(AuthEnhancedEmail, self).__init__(**kwargs)
 
         # check for 'template_name'
-        # TODO: Is this really a minimum requirement?
         if not template_name:
             raise self.AuthEnhancedEmailException(_("A 'template_name' must be provided!"))
 
@@ -82,7 +81,6 @@ def callback_admin_information_new_signup(sender, instance, created, **kwargs):
         # prepare the recipient list
         mail_to = [(x[0], x[1]) for x in settings.DAE_ADMIN_SIGNUP_NOTIFICATION if 'mail' in x[2]]
 
-        # TODO: prepare the context
         mail_context = {
             # TODO: sufficient? 'new_user.username' in templates rely on 'username'
             #   being get_username()... KEEP IT AS ABSTRACT AS POSSIBLE
@@ -99,8 +97,6 @@ def callback_admin_information_new_signup(sender, instance, created, **kwargs):
         }
 
         # addes the current operation mode to the context
-        # TODO: This is not the best solution, but even better than to compare
-        #   to some string in the template
         if settings.DAE_OPERATION_MODE == DAE_CONST_MODE_AUTO_ACTIVATION:
             mail_context['mode_auto'] = True
         elif settings.DAE_OPERATION_MODE == DAE_CONST_MODE_EMAIL_ACTIVATION:
@@ -159,7 +155,7 @@ def callback_user_signup_email_verification(sender, instance, created, **kwargs)
             from_email=settings.DAE_EMAIL_FROM_ADDRESS,
             subject=mail_subject,
             template_name='user_email_verification',
-            to=(instance.email, )   # TODO: don't rely on email! Use EMAIL_FIELD
+            to=(getattr(instance, instance.EMAIL_FIELD), )
         )
 
         # actually send the mail

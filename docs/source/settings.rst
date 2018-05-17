@@ -17,6 +17,50 @@ Available Settings
 
 .. glossary::
 
+    DAE_ADMIN_LIST_DISPLAY
+        Controls the values, that are included in Django's admin backend object
+        list view. Django's default ``UserAdmin`` implementation uses the
+        following list, which is considered the *default value*: ``('username', 'email', 'first_name', 'last_name', 'is_staff')``.
+
+        If this setting value is set, it will simply substitute the ``list_display``-attribute
+        of the admin class.
+
+        If your project uses a custom user model, make sure to include actual
+        attributes of that model in this list.
+
+        Additionally, the following enhancements are provided by the app's
+        implementation of the admin class:
+
+        * ``'is_active_with_action'``: Combines the value of ``is_active`` with a button to activate / deactive this user.
+        * ``'status_aggregated'``: Returns localized strings, describing the status of the user. Possible values: ``'user'``, ``'staff'`` and ``'superuser'``.
+        * ``'username_status_char'``: Returns the username attribute, prefixed with a configurable character. See :term:`DAE_ADMIN_USERNAME_STATUS_CHAR`.
+        * ``'username_status_color'``: Returns the username, colored with configurable colors. See :term:`DAE_ADMIN_USERNAME_STATUS_COLOR`.
+        * ``'toggle_is_active'``: Shows a button to activate / deactivate the user, depending on his activation status (``is_active``). It is recommended to use ``'is_active_with_action'`` instead.
+
+        **Accepted Values:**
+
+        * a tuple containing attributes of the user model as strings, e.g. ``('username', 'email')``.
+
+    DAE_ADMIN_SEARCH_FIELDS
+        Controls the fields, that are considered when using the search box in
+        Django's admin backend object list view. Django's default ``UserAdmin``
+        implementation uses the following list, which is considered the
+        *default value*: ``('username', 'email', 'first_name', 'last_name')``.
+
+        If this setting value is set, it will simply substitute the ``search_fields``-attribute
+        of the admin class.
+
+        If your project uses a custom user model, make sure to include actual
+        attributes of that model in this list.
+
+        Furthermore, if set to an empty tuple, ``()``, the search box will be
+        disabled.
+
+        **Accepted Values:**
+
+        * a tuple containing attributes of the user model as strings, e.g. ``('username', 'email')``.
+        * an empty tuple ``()``. This deactivates the search box.
+
     DAE_ADMIN_SIGNUP_NOTIFICATION
         Controls, if admins / superusers will be notified of new signups.
 
@@ -24,6 +68,24 @@ Available Settings
 
         * ``False`` (default value): No notification will be sent.
         * a tuple of the following structure: ``('django', 'django@localhost', ('mail', )),``, where ``'django'`` is a username, ``'django@localhost'`` a valid email address and ``('mail', )`` a tuple of notification methods. As of now, only ``'mail'`` is supported.
+
+    DAE_ADMIN_USERNAME_STATUS_CHAR
+        This setting controls the characters, that are used to prefix usernames
+        depending on their status, if ``'username_status_char'`` is in
+        :term:`DAE_ADMIN_LIST_DISPLAY`.
+
+        **Accepted Value:**
+
+        * a tuple containing two single characters, e.g. ``('#', '$')``. ``'#'`` will be used to prefix superusers and ``'$'`` for staff users.
+
+    DAE_ADMIN_USERNAME_STATUS_COLOR
+        This setting controls the color, that is used to color usernames,
+        depending on their status, if ``'username_status_color'`` is in
+        :term:`DAE_ADMIN_LIST_DISPLAY`.
+
+        **Accepted Value:**
+
+        * a tuple containing two hexadecimal color codes (with leading ``#``), e.g. ``('#cc0000', '#00cc00')``. Names of superusers will be colored red (``'#cc0000'``), staff users green (``'#00cc00'``).
 
     DAE_EMAIL_ADMIN_NOTIFICATION_PREFIX
         All emails to admins / superusers will have a subject, that is prefixed

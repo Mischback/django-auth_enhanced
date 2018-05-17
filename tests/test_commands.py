@@ -113,7 +113,7 @@ class CheckAdminNotificationTests(AuthEnhancedTestCase):
 
     @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=(
         ('django', 'django@localhost', ('mail', )),
-        ('foo', 'foo@localhost', ('mail', )),
+        ('superuser', 'superuser@localhost', ('mail', )),
     ))
     def test_all_valid(self):
         """Returns True, if the setting is completely valid."""
@@ -122,8 +122,8 @@ class CheckAdminNotificationTests(AuthEnhancedTestCase):
 
     @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=(
         ('django', 'django@localhost', ('mail', )),
-        ('foo', 'foo@localhost', ('mail', )),
-        ('bar', 'bar@localhost', ('mail', )),
+        ('superuser', 'superuser@localhost', ('mail', )),
+        ('su_inactive_2', 'su_inactive_2@localhost', ('mail', )),
     ))
     def test_address_unverified(self):
         """Raises an exception, if one of the accounts has an unverified email
@@ -131,15 +131,15 @@ class CheckAdminNotificationTests(AuthEnhancedTestCase):
 
         with self.assertRaisesMessage(
             CommandError,
-            "The following accounts do not have a verified email address: bar. "
-            "Administrative notifications will only be sent to verified email "
-            "addresses."
+            "The following accounts do not have a verified email address: "
+            "su_inactive_2. Administrative notifications will only be sent to "
+            "verified email addresses."
         ):
             check_admin_notification()
 
     @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=(
         ('django', 'django@localhost', ('mail', )),
-        ('foo', 'bar@localhost', ('mail', )),
+        ('superuser', 'foo@localhost', ('mail', )),
     ))
     def test_address_not_matching(self):
         """Raises an exception, if one of the accounts has an unverified email
@@ -147,17 +147,17 @@ class CheckAdminNotificationTests(AuthEnhancedTestCase):
 
         with self.assertRaisesMessage(
             CommandError,
-            "The following accounts do not match the project's settings: foo. "
-            "The specified email addresses are not the ones associated with "
-            "the account. Administrative notifications will only be sent to "
-            "registered email addresses."
+            "The following accounts do not match the project's settings: "
+            "superuser. The specified email addresses are not the ones "
+            "associated with the account. Administrative notifications will "
+            "only be sent to registered email addresses."
         ):
             check_admin_notification()
 
     @override_settings(DAE_ADMIN_SIGNUP_NOTIFICATION=(
         ('django', 'django@localhost', ('mail', )),
-        ('foo', 'foo@localhost', ('mail', )),
-        ('baz', 'baz@localhost', ('mail', )),
+        ('superuser', 'superuser@localhost', ('mail', )),
+        ('user', 'user@localhost', ('mail', )),
     ))
     def test_insufficient_permissions(self):
         """Raises an exception, if one of the accounts does not have sufficient
@@ -166,7 +166,7 @@ class CheckAdminNotificationTests(AuthEnhancedTestCase):
         with self.assertRaisesMessage(
             CommandError,
             "The following accounts do not have the sufficient permissions to "
-            "actually modify accounts: baz."
+            "actually modify accounts: user."
         ):
             check_admin_notification()
 
