@@ -41,8 +41,25 @@ Available Settings
 
         * a tuple containing attributes of the user model as strings, e.g. ``('username', 'email')``.
 
-    DAE_ADMIN_SHOW_SEARCHBOX
-        TODO: document this setting!
+    DAE_ADMIN_SEARCH_FIELDS
+        Controls the fields, that are considered when using the search box in
+        Django's admin backend object list view. Django's default ``UserAdmin``
+        implementation uses the following list, which is considered the
+        *default value*: ``('username', 'email', 'first_name', 'last_name')``.
+
+        If this setting value is set, it will simply substitute the ``search_fields``-attribute
+        of the admin class.
+
+        If your project uses a custom user model, make sure to include actual
+        attributes of that model in this list.
+
+        Furthermore, if set to an empty tuple, ``()``, the search box will be
+        disabled.
+
+        **Accepted Values:**
+
+        * a tuple containing attributes of the user model as strings, e.g. ``('username', 'email')``.
+        * an empty tuple ``()``. This deactivates the search box.
 
     DAE_ADMIN_SIGNUP_NOTIFICATION
         Controls, if admins / superusers will be notified of new signups.

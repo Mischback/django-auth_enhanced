@@ -60,7 +60,7 @@ test-time:
 
 # fetch a list of TODOs
 todo:
-	grep -nr --exclude-dir=".tox" --exclude="Makefile" --color "TODO" *
+	git grep -n "TODO"
 
 ##### wrapper for django-admin commands #####
 

@@ -175,12 +175,14 @@ class CheckSettingsValuesTests(AuthEnhancedTestCase):
         errors = check_settings_values(None)
         self.assertEqual(errors, [E010])
 
+    @skip('currently inactive')
     @override_settings(DAE_ADMIN_SHOW_SEARCHBOX=True)
     def test_e011_valid(self):
         """Check should accept valid values."""
         errors = check_settings_values(None)
         self.assertEqual(errors, [])
 
+    @skip('currently inactive')
     @override_settings(DAE_ADMIN_SHOW_SEARCHBOX='foo')
     def test_e011_invalid(self):
         """Invalid values show an error message."""

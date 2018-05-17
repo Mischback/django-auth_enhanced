@@ -258,8 +258,8 @@ def check_settings_values(app_configs, **kwargs):
         errors.append(E010)
 
     # DAE_ADMIN_SHOW_SEARCHBOX
-    if not isinstance(settings.DAE_ADMIN_SHOW_SEARCHBOX, bool):
-        errors.append(E011)
+    # if not isinstance(settings.DAE_ADMIN_SHOW_SEARCHBOX, bool):
+    #     errors.append(E011)
 
     # DAE_ADMIN_USERNAME_STATUS_COLOR
     try:

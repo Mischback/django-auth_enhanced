@@ -98,20 +98,15 @@ class EnhancedUserAdmin(UserAdmin):
     #   ('is_staff', 'is_superuser', 'is_active', 'groups')
     list_filter = (EnhancedUserStatusFilter, 'is_active', 'groups')
 
-    # 'search_fields' determines the target fields for the search box
-    # The search box can be disabled with an app-specific setting, accordingly
-    #   the 'search_field' will be set to an empty tuple.
-    # TODO: This is *wrong*. DAE_ADMIN_SHOW_SEARCHBOX should not be a boolean
-    #   value, but a tuple, just like DAE_ADMIN_LIST_DISPLAY
-    #   This is required to actually support custom user models.
+    # 'search_fields' determines the target fields for the search box.
+    # Django's default admin class provides the following list:
+    #   ('username', 'email', 'first_name', 'last_name')
+    # Adjust this list, if you are using a custom user model or set it to ()
+    #   to deactivate the search box.
     try:
-        if not settings.DAE_ADMIN_SHOW_SEARCHBOX:
-            search_fields = ()
-            setattr(settings, 'DAE_ADMIN_SHOW_SEARCHBOX', False)
+        search_fields = settings.DAE_ADMIN_SEARCH_FIELDS
     except AttributeError:
-        # following line is exactly Django's default. Doesn't need to be set!
-        # search_fields = ('username', 'email', 'first_name', 'last_name')
-        setattr(settings, 'DAE_ADMIN_SHOW_SEARCHBOX', True)
+        pass
 
     # 'ordering' controls the default ordering of the list view
     # Django's default value is just 'username'
